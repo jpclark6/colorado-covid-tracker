@@ -3,7 +3,7 @@ from flask import jsonify
 
 app = FlaskLambda(__name__)
 
-@app.route('/cases/daily')
+@app.route('/cases/daily') # need better route. Pass in daily as a param?
 def daily_cases():
     mock_data = {
         'validThrough': '2020-01-28',
