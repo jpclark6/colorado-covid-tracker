@@ -3,15 +3,15 @@ from flask import jsonify
 
 app = FlaskLambda(__name__)
 
-@app.route('/hello', methods=['GET'])
-def foo():
-    
-    return (
-        json.dumps(data, indent=4, sort_keys=True),
-        200,
-        {'Content-Type': 'application/json'}
-    )
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
+@app.route('/cases/daily')
+def daily_cases():
+    mock_data = {
+        'validThrough': '2020-01-28',
+        'data': [
+            {'date': '2020-01-25', 'newCases': 500},
+            {'date': '2020-01-26', 'newCases': 600},
+            {'date': '2020-01-27', 'newCases': 700},
+            {'date': '2020-01-28', 'newCases': 800},
+        ]
+    }
+    return jsonify(mock_data)
