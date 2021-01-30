@@ -1,21 +1,41 @@
 openapi: 3.0.0
 info:
   title: Colorado Covid Tracker
-  description: API to consume Colorado covid data
+  description: API to consume Colorado COVID data
   version: 0.1.0
 servers:
-  - url: http://staging-api.example.com
+  - url: <not hosted yet>
     description: API Gateway
 paths:
-  /cases:
+  /covid-data:
     get:
-      summary: Returns a list of covid case numbers by day.
+      summary: Returns a list of covid case and vaccine numbers by day
       responses:
-        '200':    # status code
-          description: A JSON array of covid data
+        '200':
+          description: OK
           content:
             application/json:
               schema: 
                 type: array
                 items: 
-                  type: string
+                  $ref: '#/components/schemas/CovidData'
+        '405':
+          description: Method Not Allowed
+          content: 
+            'application/json': {}
+            'application/xml': {}
+components:
+  schemas:
+    CovidData:
+      type: object
+      properties:
+        date:
+          type: string
+        newCases:
+          type: integer
+        cumulativeCases:
+          type: integer
+        newFirstDoseVaccinated:
+          type: integer
+        cumulativeFirstDoseVaccinated:
+          type: integer
