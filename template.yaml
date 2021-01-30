@@ -4,33 +4,73 @@ Description: >
   colorado-covid-tracker
 
   Sample SAM Template for colorado-covid-tracker
-
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Parameters: 
+  NotificationEmail:
+    Type: String
 Globals:
   Function:
     Timeout: 3
+    Environment:
+      Variables:
+        BUCKET_NAME: !Ref S3Bucket
 
 Resources:
   CoCovidFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: api/
+      CodeUri: src/api/
       Handler: app.app
       Runtime: python3.8
       Events:
         CoCovid:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Path: /cases/daily
+            Path: /covid-data
             Method: get
+  
+  ExtractRawDataDailyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/etl/
+      Handler: extract_raw_data.handler
+      Runtime: runtime
+      Events:
+        CheckWebsiteScheduledEvent:
+          Type: Schedule
+          Properties:
+            Schedule: cron(15 10 * * ? *)
+
+  AlarmTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      Subscription:
+      - Protocol: email
+        Endpoint: !Ref NotificationEmail
+
+  Alarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmActions:
+        - !Ref AlarmTopic
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref ExtractRawDataDailyFunction
+      EvaluationPeriods: 1
+      MetricName: Errors
+      Namespace: AWS/Lambda
+      Period: 60
+      Statistic: Sum
+      Threshold: '1'
+
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
 
 Outputs:
-  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
-  # Find out more about other implicit resources you can reference within SAM
-  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
   CoCovidApi:
     Description: "API Gateway endpoint URL for Prod stage for Colorado Covid function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/covid-data/"
   CoCovidFunction:
     Description: "Colorado Covid Lambda Function ARN"
     Value: !GetAtt CoCovidFunction.Arn
