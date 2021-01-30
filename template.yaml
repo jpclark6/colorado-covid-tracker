@@ -21,6 +21,8 @@ Resources:
       CodeUri: src/api/
       Handler: app.app
       Runtime: python3.8
+      Policies:
+      - AmazonS3FullAccess
       Events:
         CoCovid:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
@@ -34,6 +36,8 @@ Resources:
       CodeUri: src/etl/
       Handler: extract_raw_data.handler
       Runtime: python3.8
+      Policies:
+      - AmazonS3FullAccess
       Events:
         CheckWebsiteScheduledEvent:
           Type: Schedule
@@ -46,6 +50,8 @@ Resources:
       CodeUri: src/etl/
       Handler: transform_data.handler
       Runtime: python3.8
+      Policies:
+      - AmazonS3FullAccess
 
   AlarmTopic:
     Type: AWS::SNS::Topic
