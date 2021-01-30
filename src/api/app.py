@@ -3,8 +3,12 @@ from flask import jsonify
 
 app = FlaskLambda(__name__)
 
-@app.route('/covid-data') # need better route. Pass in daily as a param?
+@app.route('/covid-data')
 def daily_cases():
+    # grab cleaned data from s3
+    # format if needed
+    # update to database if feeling motivated
+
     mock_data = [
         {
             "date": "2020-01-15",

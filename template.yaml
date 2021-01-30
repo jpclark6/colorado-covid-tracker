@@ -33,12 +33,19 @@ Resources:
     Properties:
       CodeUri: src/etl/
       Handler: extract_raw_data.handler
-      Runtime: runtime
+      Runtime: python3.8
       Events:
         CheckWebsiteScheduledEvent:
           Type: Schedule
           Properties:
             Schedule: cron(15 10 * * ? *)
+
+  TransformDataDailyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/etl/
+      Handler: transform_data.handler
+      Runtime: python3.8
 
   AlarmTopic:
     Type: AWS::SNS::Topic
@@ -55,7 +62,11 @@ Resources:
       ComparisonOperator: GreaterThanOrEqualToThreshold
       Dimensions:
         - Name: FunctionName
+          Value: !Ref CoCovidFunction
+        - Name: FunctionName
           Value: !Ref ExtractRawDataDailyFunction
+        - Name: FunctionName
+          Value: !Ref TransformDataDailyFunction
       EvaluationPeriods: 1
       MetricName: Errors
       Namespace: AWS/Lambda
