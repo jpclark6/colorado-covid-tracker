@@ -7,6 +7,10 @@ Description: >
 Parameters: 
   NotificationEmail:
     Type: String
+  DbCredentials:
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Description: Database creds in the format postgres://<user>:<pw>@<host>/<db>
+    Default: CovidDatabaseURL
 Globals:
   Function:
     Timeout: 3
@@ -23,6 +27,10 @@ Resources:
       Runtime: python3.8
       Policies:
       - AmazonS3FullAccess
+      - AmazonSSMReadOnlyAccess
+      Environment:
+        Variables:
+          DB_CREDENTIALS: !Ref DbCredentials
       Events:
         CoCovid:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
@@ -30,28 +38,53 @@ Resources:
             Path: /covid-data
             Method: get
   
-  ExtractRawDataDailyFunction:
+  RawDailyFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/etl/
-      Handler: extract_raw_data.handler
+      Handler: extract.handler
       Runtime: python3.8
       Policies:
       - AmazonS3FullAccess
+      - AmazonSSMReadOnlyAccess
       Events:
-        CheckWebsiteScheduledEvent:
+        EEvent:
           Type: Schedule
           Properties:
-            Schedule: cron(15 10 * * ? *)
+            Schedule: cron(0 3 * * ? *)
 
-  TransformDataDailyFunction:
+  TransformDailyFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/etl/
-      Handler: transform_data.handler
+      Handler: transform.handler
       Runtime: python3.8
       Policies:
       - AmazonS3FullAccess
+      - AmazonSSMReadOnlyAccess
+      Events:
+        TEvent:
+          Type: Schedule
+          Properties:
+            Schedule: cron(2 3 * * ? *)
+
+  LoadDailyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/etl/
+      Handler: load.handler
+      Runtime: python3.8
+      Policies:
+      - AmazonS3FullAccess
+      - AmazonSSMReadOnlyAccess
+      Environment:
+        Variables:
+          DB_CREDENTIALS: !Ref DbCredentials
+      Events:
+        LEvent:
+          Type: Schedule
+          Properties:
+            Schedule: cron(4 3 * * ? *)
 
   AlarmTopic:
     Type: AWS::SNS::Topic
@@ -67,12 +100,14 @@ Resources:
         - !Ref AlarmTopic
       ComparisonOperator: GreaterThanOrEqualToThreshold
       Dimensions:
-        - Name: FunctionName
+        - Name: APIFunction
           Value: !Ref CoCovidFunction
-        - Name: FunctionName
-          Value: !Ref ExtractRawDataDailyFunction
-        - Name: FunctionName
-          Value: !Ref TransformDataDailyFunction
+        - Name: RawLambdaFunction
+          Value: !Ref RawDailyFunction
+        - Name: TransormLambdaFunction
+          Value: !Ref TransformDailyFunction
+        - Name: LoadLambdaFunction
+          Value: !Ref LoadDailyFunction
       EvaluationPeriods: 1
       MetricName: Errors
       Namespace: AWS/Lambda

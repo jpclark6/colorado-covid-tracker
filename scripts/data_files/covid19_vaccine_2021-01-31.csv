@@ -1,0 +1,474 @@
+section,category,metric,type,date,value
+State Data,Cumulative counts to date,Cumulative Doses Administered,All COVID Vaccines,NA,586025
+State Data,Cumulative counts to date,People Immunized with One Dose,NA,NA,455285
+State Data,Cumulative counts to date,People Immunized with Two Doses,NA,NA,130330
+State Data,Cumulative counts to date,Total Vaccine Providers,NA,NA,646
+State Metrics,Vaccinations,Immunized Yesterday,Moderna,NA,3780
+State Metrics,Vaccinations,Immunized Yesterday,Moderna Change from Yesterday,NA,-4576
+State Metrics,Vaccinations,Immunized Yesterday,Pfizer,NA,8569
+State Metrics,Vaccinations,Immunized Yesterday,Pfizer Change from Yesterday,NA,-3497
+State Metrics,Vaccinations,Immunized Yesterday,Unspecified COVID Vaccine,NA,10
+State Metrics,Vaccinations,Immunized Yesterday,Unspecified COVID Vaccine Change from Yesterday,NA,10
+State Metrics,Vaccinations,Record Added Today But Immunized In Past,Moderna,NA,0
+State Metrics,Vaccinations,Record Added Today But Immunized In Past,Pfizer,NA,0
+State Metrics,Vaccinations,Record Added Today But Immunized In Past,Unspecified COVID Vaccine,NA,0
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2020-12-14,192
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2020-12-14,192
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2020-12-14,0
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2020-12-14,192
+Vaccine Administration,Administration,Daily,Pfizer,2020-12-14,192
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2020-12-14,0
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2020-12-15,413
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2020-12-15,412
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2020-12-15,0
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2020-12-15,221
+Vaccine Administration,Administration,Daily,Pfizer,2020-12-15,220
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2020-12-15,0
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2020-12-16,4200
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2020-12-16,4195
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2020-12-16,0
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2020-12-16,3787
+Vaccine Administration,Administration,Daily,Pfizer,2020-12-16,3783
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2020-12-16,0
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2020-12-17,16372
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2020-12-17,16366
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2020-12-17,1
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2020-12-17,12172
+Vaccine Administration,Administration,Daily,Pfizer,2020-12-17,12171
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2020-12-17,1
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2020-12-18,28610
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2020-12-18,28600
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2020-12-18,1
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2020-12-18,12238
+Vaccine Administration,Administration,Daily,Pfizer,2020-12-18,12234
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2020-12-18,0
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2020-12-19,34067
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2020-12-19,34055
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2020-12-19,1
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2020-12-19,5457
+Vaccine Administration,Administration,Daily,Pfizer,2020-12-19,5455
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2020-12-19,0
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2020-12-20,36937
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2020-12-20,8
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2020-12-20,36915
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2020-12-20,3
+Vaccine Administration,Administration,Cumulative Weekly,All COVID Vaccines,2020-12-20,70930
+Vaccine Administration,Administration,Cumulative Weekly,Moderna,2020-12-20,19565
+Vaccine Administration,Administration,Cumulative Weekly,Pfizer,2020-12-20,51345
+Vaccine Administration,Administration,Cumulative Weekly,Unspecified COVID Vaccine,2020-12-20,9
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2020-12-20,2870
+Vaccine Administration,Administration,Daily,Moderna,2020-12-20,8
+Vaccine Administration,Administration,Daily,Pfizer,2020-12-20,2860
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2020-12-20,2
+Vaccine Administration,Administration,Weekly,All COVID Vaccines,2020-12-20,36863
+Vaccine Administration,Administration,Weekly,Moderna,2020-12-20,19565
+Vaccine Administration,Administration,Weekly,Pfizer,2020-12-20,17290
+Vaccine Administration,Administration,Weekly,Unspecified COVID Vaccine,2020-12-20,8
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2020-12-21,42435
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2020-12-21,36
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2020-12-21,42389
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2020-12-21,3
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2020-12-21,5498
+Vaccine Administration,Administration,Daily,Moderna,2020-12-21,28
+Vaccine Administration,Administration,Daily,Pfizer,2020-12-21,5474
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2020-12-21,0
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2020-12-22,49999
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2020-12-22,3629
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2020-12-22,46358
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2020-12-22,5
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2020-12-22,7564
+Vaccine Administration,Administration,Daily,Moderna,2020-12-22,3593
+Vaccine Administration,Administration,Daily,Pfizer,2020-12-22,3969
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2020-12-22,2
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2020-12-23,64258
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2020-12-23,14000
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2020-12-23,50252
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2020-12-23,8
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2020-12-23,14259
+Vaccine Administration,Administration,Daily,Moderna,2020-12-23,10371
+Vaccine Administration,Administration,Daily,Pfizer,2020-12-23,3894
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2020-12-23,3
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2020-12-24,68352
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2020-12-24,17390
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2020-12-24,50955
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2020-12-24,9
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2020-12-24,4094
+Vaccine Administration,Administration,Daily,Moderna,2020-12-24,3390
+Vaccine Administration,Administration,Daily,Pfizer,2020-12-24,703
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2020-12-24,1
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2020-12-25,68365
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2020-12-25,17402
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2020-12-25,50956
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2020-12-25,9
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2020-12-25,13
+Vaccine Administration,Administration,Daily,Moderna,2020-12-25,12
+Vaccine Administration,Administration,Daily,Pfizer,2020-12-25,1
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2020-12-25,0
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2020-12-26,70917
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2020-12-26,19565
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2020-12-26,51345
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2020-12-26,9
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2020-12-26,2552
+Vaccine Administration,Administration,Daily,Moderna,2020-12-26,2163
+Vaccine Administration,Administration,Daily,Pfizer,2020-12-26,389
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2020-12-26,0
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2020-12-27,72942
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2020-12-27,21348
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2020-12-27,51587
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2020-12-27,9
+Vaccine Administration,Administration,Cumulative Weekly,All COVID Vaccines,2020-12-27,122462
+Vaccine Administration,Administration,Cumulative Weekly,Moderna,2020-12-27,53404
+Vaccine Administration,Administration,Cumulative Weekly,Pfizer,2020-12-27,69028
+Vaccine Administration,Administration,Cumulative Weekly,Unspecified COVID Vaccine,2020-12-27,19
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2020-12-27,2025
+Vaccine Administration,Administration,Daily,Moderna,2020-12-27,1783
+Vaccine Administration,Administration,Daily,Pfizer,2020-12-27,242
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2020-12-27,0
+Vaccine Administration,Administration,Weekly,All COVID Vaccines,2020-12-27,51532
+Vaccine Administration,Administration,Weekly,Moderna,2020-12-27,33839
+Vaccine Administration,Administration,Weekly,Pfizer,2020-12-27,17683
+Vaccine Administration,Administration,Weekly,Unspecified COVID Vaccine,2020-12-27,10
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2020-12-28,81823
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2020-12-28,28049
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2020-12-28,53764
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2020-12-28,12
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2020-12-28,8881
+Vaccine Administration,Administration,Daily,Moderna,2020-12-28,6701
+Vaccine Administration,Administration,Daily,Pfizer,2020-12-28,2177
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2020-12-28,3
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2020-12-29,90846
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2020-12-29,35242
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2020-12-29,55592
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2020-12-29,14
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2020-12-29,9023
+Vaccine Administration,Administration,Daily,Moderna,2020-12-29,7193
+Vaccine Administration,Administration,Daily,Pfizer,2020-12-29,1828
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2020-12-29,2
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2020-12-30,106104
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2020-12-30,45154
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2020-12-30,60936
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2020-12-30,16
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2020-12-30,15258
+Vaccine Administration,Administration,Daily,Moderna,2020-12-30,9912
+Vaccine Administration,Administration,Daily,Pfizer,2020-12-30,5344
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2020-12-30,2
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2020-12-31,115694
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2020-12-31,50945
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2020-12-31,64732
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2020-12-31,19
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2020-12-31,9590
+Vaccine Administration,Administration,Daily,Moderna,2020-12-31,5791
+Vaccine Administration,Administration,Daily,Pfizer,2020-12-31,3796
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2020-12-31,3
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2021-01-01,116599
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2021-01-01,51318
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2021-01-01,65264
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2021-01-01,19
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2021-01-01,905
+Vaccine Administration,Administration,Daily,Moderna,2021-01-01,373
+Vaccine Administration,Administration,Daily,Pfizer,2021-01-01,532
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2021-01-01,0
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2021-01-02,122449
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2021-01-02,53404
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2021-01-02,69028
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2021-01-02,19
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2021-01-02,5850
+Vaccine Administration,Administration,Daily,Moderna,2021-01-02,2086
+Vaccine Administration,Administration,Daily,Pfizer,2021-01-02,3764
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2021-01-02,0
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2021-01-03,124481
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2021-01-03,54204
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2021-01-03,70260
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2021-01-03,19
+Vaccine Administration,Administration,Cumulative Weekly,All COVID Vaccines,2021-01-03,234392
+Vaccine Administration,Administration,Cumulative Weekly,Moderna,2021-01-03,109767
+Vaccine Administration,Administration,Cumulative Weekly,Pfizer,2021-01-03,124581
+Vaccine Administration,Administration,Cumulative Weekly,Unspecified COVID Vaccine,2021-01-03,33
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2021-01-03,2032
+Vaccine Administration,Administration,Daily,Moderna,2021-01-03,800
+Vaccine Administration,Administration,Daily,Pfizer,2021-01-03,1232
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2021-01-03,0
+Vaccine Administration,Administration,Weekly,All COVID Vaccines,2021-01-03,111930
+Vaccine Administration,Administration,Weekly,Moderna,2021-01-03,56363
+Vaccine Administration,Administration,Weekly,Pfizer,2021-01-03,55553
+Vaccine Administration,Administration,Weekly,Unspecified COVID Vaccine,2021-01-03,14
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2021-01-04,133413
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2021-01-04,59973
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2021-01-04,73422
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2021-01-04,20
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2021-01-04,8932
+Vaccine Administration,Administration,Daily,Moderna,2021-01-04,5769
+Vaccine Administration,Administration,Daily,Pfizer,2021-01-04,3162
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2021-01-04,1
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2021-01-05,145270
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2021-01-05,67844
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2021-01-05,77407
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2021-01-05,22
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2021-01-05,11857
+Vaccine Administration,Administration,Daily,Moderna,2021-01-05,7871
+Vaccine Administration,Administration,Daily,Pfizer,2021-01-05,3985
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2021-01-05,2
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2021-01-06,164627
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2021-01-06,78185
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2021-01-06,86421
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2021-01-06,25
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2021-01-06,19357
+Vaccine Administration,Administration,Daily,Moderna,2021-01-06,10341
+Vaccine Administration,Administration,Daily,Pfizer,2021-01-06,9014
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2021-01-06,3
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2021-01-07,190883
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2021-01-07,89432
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2021-01-07,101427
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2021-01-07,28
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2021-01-07,26256
+Vaccine Administration,Administration,Daily,Moderna,2021-01-07,11247
+Vaccine Administration,Administration,Daily,Pfizer,2021-01-07,15006
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2021-01-07,3
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2021-01-08,220529
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2021-01-08,103058
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2021-01-08,117444
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2021-01-08,31
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2021-01-08,29646
+Vaccine Administration,Administration,Daily,Moderna,2021-01-08,13626
+Vaccine Administration,Administration,Daily,Pfizer,2021-01-08,16017
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2021-01-08,3
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2021-01-09,234377
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2021-01-09,109767
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2021-01-09,124581
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2021-01-09,33
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2021-01-09,13848
+Vaccine Administration,Administration,Daily,Moderna,2021-01-09,6709
+Vaccine Administration,Administration,Daily,Pfizer,2021-01-09,7137
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2021-01-09,2
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2021-01-10,238604
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2021-01-10,111182
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2021-01-10,127393
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2021-01-10,33
+Vaccine Administration,Administration,Cumulative Weekly,All COVID Vaccines,2021-01-10,341585
+Vaccine Administration,Administration,Cumulative Weekly,Moderna,2021-01-10,162898
+Vaccine Administration,Administration,Cumulative Weekly,Pfizer,2021-01-10,178611
+Vaccine Administration,Administration,Cumulative Weekly,Unspecified COVID Vaccine,2021-01-10,65
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2021-01-10,4227
+Vaccine Administration,Administration,Daily,Moderna,2021-01-10,1415
+Vaccine Administration,Administration,Daily,Pfizer,2021-01-10,2812
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2021-01-10,0
+Vaccine Administration,Administration,Weekly,All COVID Vaccines,2021-01-10,107193
+Vaccine Administration,Administration,Weekly,Moderna,2021-01-10,53131
+Vaccine Administration,Administration,Weekly,Pfizer,2021-01-10,54030
+Vaccine Administration,Administration,Weekly,Unspecified COVID Vaccine,2021-01-10,32
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2021-01-11,255337
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2021-01-11,118969
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2021-01-11,136334
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2021-01-11,38
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2021-01-11,16733
+Vaccine Administration,Administration,Daily,Moderna,2021-01-11,7787
+Vaccine Administration,Administration,Daily,Pfizer,2021-01-11,8941
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2021-01-11,5
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2021-01-12,271256
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2021-01-12,126897
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2021-01-12,144322
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2021-01-12,41
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2021-01-12,15919
+Vaccine Administration,Administration,Daily,Moderna,2021-01-12,7928
+Vaccine Administration,Administration,Daily,Pfizer,2021-01-12,7988
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2021-01-12,3
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2021-01-13,291528
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2021-01-13,137611
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2021-01-13,153864
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2021-01-13,58
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2021-01-13,20272
+Vaccine Administration,Administration,Daily,Moderna,2021-01-13,10714
+Vaccine Administration,Administration,Daily,Pfizer,2021-01-13,9542
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2021-01-13,17
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2021-01-14,310825
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2021-01-14,147364
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2021-01-14,163405
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2021-01-14,63
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2021-01-14,19297
+Vaccine Administration,Administration,Daily,Moderna,2021-01-14,9753
+Vaccine Administration,Administration,Daily,Pfizer,2021-01-14,9541
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2021-01-14,5
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2021-01-15,330307
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2021-01-15,157243
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2021-01-15,173007
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2021-01-15,64
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2021-01-15,19482
+Vaccine Administration,Administration,Daily,Moderna,2021-01-15,9879
+Vaccine Administration,Administration,Daily,Pfizer,2021-01-15,9602
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2021-01-15,1
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2021-01-16,341567
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2021-01-16,162898
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2021-01-16,178611
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2021-01-16,65
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2021-01-16,11260
+Vaccine Administration,Administration,Daily,Moderna,2021-01-16,5655
+Vaccine Administration,Administration,Daily,Pfizer,2021-01-16,5604
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2021-01-16,1
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2021-01-17,345444
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2021-01-17,165064
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2021-01-17,180319
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2021-01-17,68
+Vaccine Administration,Administration,Cumulative Weekly,All COVID Vaccines,2021-01-17,467454
+Vaccine Administration,Administration,Cumulative Weekly,Moderna,2021-01-17,229938
+Vaccine Administration,Administration,Cumulative Weekly,Pfizer,2021-01-17,237418
+Vaccine Administration,Administration,Cumulative Weekly,Unspecified COVID Vaccine,2021-01-17,87
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2021-01-17,3877
+Vaccine Administration,Administration,Daily,Moderna,2021-01-17,2166
+Vaccine Administration,Administration,Daily,Pfizer,2021-01-17,1708
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2021-01-17,3
+Vaccine Administration,Administration,Weekly,All COVID Vaccines,2021-01-17,125869
+Vaccine Administration,Administration,Weekly,Moderna,2021-01-17,67040
+Vaccine Administration,Administration,Weekly,Pfizer,2021-01-17,58807
+Vaccine Administration,Administration,Weekly,Unspecified COVID Vaccine,2021-01-17,22
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2021-01-18,355883
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2021-01-18,169844
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2021-01-18,185978
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2021-01-18,68
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2021-01-18,10439
+Vaccine Administration,Administration,Daily,Moderna,2021-01-18,4780
+Vaccine Administration,Administration,Daily,Pfizer,2021-01-18,5659
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2021-01-18,0
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2021-01-19,370774
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2021-01-19,176545
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2021-01-19,194166
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2021-01-19,70
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2021-01-19,14891
+Vaccine Administration,Administration,Daily,Moderna,2021-01-19,6701
+Vaccine Administration,Administration,Daily,Pfizer,2021-01-19,8188
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2021-01-19,2
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2021-01-20,395644
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2021-01-20,191827
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2021-01-20,203751
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2021-01-20,75
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2021-01-20,24870
+Vaccine Administration,Administration,Daily,Moderna,2021-01-20,15282
+Vaccine Administration,Administration,Daily,Pfizer,2021-01-20,9585
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2021-01-20,5
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2021-01-21,424364
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2021-01-21,207019
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2021-01-21,217277
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2021-01-21,77
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2021-01-21,28720
+Vaccine Administration,Administration,Daily,Moderna,2021-01-21,15192
+Vaccine Administration,Administration,Daily,Pfizer,2021-01-21,13526
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2021-01-21,2
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2021-01-22,452498
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2021-01-22,221716
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2021-01-22,230714
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2021-01-22,83
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2021-01-22,28134
+Vaccine Administration,Administration,Daily,Moderna,2021-01-22,14697
+Vaccine Administration,Administration,Daily,Pfizer,2021-01-22,13437
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2021-01-22,6
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2021-01-23,467428
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2021-01-23,229938
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2021-01-23,237418
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2021-01-23,87
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2021-01-23,14930
+Vaccine Administration,Administration,Daily,Moderna,2021-01-23,8222
+Vaccine Administration,Administration,Daily,Pfizer,2021-01-23,6704
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2021-01-23,4
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2021-01-24,474056
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2021-01-24,233318
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2021-01-24,240666
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2021-01-24,87
+Vaccine Administration,Administration,Cumulative Weekly,All COVID Vaccines,2021-01-24,586055
+Vaccine Administration,Administration,Cumulative Weekly,Moderna,2021-01-24,298999
+Vaccine Administration,Administration,Cumulative Weekly,Pfizer,2021-01-24,286941
+Vaccine Administration,Administration,Cumulative Weekly,Unspecified COVID Vaccine,2021-01-24,104
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2021-01-24,6628
+Vaccine Administration,Administration,Daily,Moderna,2021-01-24,3380
+Vaccine Administration,Administration,Daily,Pfizer,2021-01-24,3248
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2021-01-24,0
+Vaccine Administration,Administration,Weekly,All COVID Vaccines,2021-01-24,118601
+Vaccine Administration,Administration,Weekly,Moderna,2021-01-24,69061
+Vaccine Administration,Administration,Weekly,Pfizer,2021-01-24,49523
+Vaccine Administration,Administration,Weekly,Unspecified COVID Vaccine,2021-01-24,17
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2021-01-25,491256
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2021-01-25,246106
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2021-01-25,245076
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2021-01-25,89
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2021-01-25,17200
+Vaccine Administration,Administration,Daily,Moderna,2021-01-25,12788
+Vaccine Administration,Administration,Daily,Pfizer,2021-01-25,4410
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2021-01-25,2
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2021-01-26,509361
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2021-01-26,259142
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2021-01-26,250144
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2021-01-26,90
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2021-01-26,18105
+Vaccine Administration,Administration,Daily,Moderna,2021-01-26,13036
+Vaccine Administration,Administration,Daily,Pfizer,2021-01-26,5068
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2021-01-26,1
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2021-01-27,533038
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2021-01-27,274050
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2021-01-27,258914
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2021-01-27,90
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2021-01-27,23677
+Vaccine Administration,Administration,Daily,Moderna,2021-01-27,14908
+Vaccine Administration,Administration,Daily,Pfizer,2021-01-27,8770
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2021-01-27,0
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2021-01-28,553244
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2021-01-28,286863
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2021-01-28,266306
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2021-01-28,94
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2021-01-28,20206
+Vaccine Administration,Administration,Daily,Moderna,2021-01-28,12813
+Vaccine Administration,Administration,Daily,Pfizer,2021-01-28,7392
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2021-01-28,4
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2021-01-29,573666
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2021-01-29,295219
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2021-01-29,278372
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2021-01-29,94
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2021-01-29,20422
+Vaccine Administration,Administration,Daily,Moderna,2021-01-29,8356
+Vaccine Administration,Administration,Daily,Pfizer,2021-01-29,12066
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2021-01-29,0
+Vaccine Administration,Administration,Cumulative Daily,All COVID Vaccines,2021-01-30,586025
+Vaccine Administration,Administration,Cumulative Daily,Moderna,2021-01-30,298999
+Vaccine Administration,Administration,Cumulative Daily,Pfizer,2021-01-30,286941
+Vaccine Administration,Administration,Cumulative Daily,Unspecified COVID Vaccine,2021-01-30,104
+Vaccine Administration,Administration,Daily,All COVID Vaccines,2021-01-30,12359
+Vaccine Administration,Administration,Daily,Moderna,2021-01-30,3780
+Vaccine Administration,Administration,Daily,Pfizer,2021-01-30,8569
+Vaccine Administration,Administration,Daily,Unspecified COVID Vaccine,2021-01-30,10
+Demographics,Age Group,0-9,All COVID Vaccines,NA,0
+Demographics,Age Group,10-19,All COVID Vaccines,NA,0.0045
+Demographics,Age Group,20-29,All COVID Vaccines,NA,0.088
+Demographics,Age Group,30-39,All COVID Vaccines,NA,0.1312
+Demographics,Age Group,40-49,All COVID Vaccines,NA,0.1165
+Demographics,Age Group,50-59,All COVID Vaccines,NA,0.1055
+Demographics,Age Group,60-69,All COVID Vaccines,NA,0.0868
+Demographics,Age Group,70-79,All COVID Vaccines,NA,0.3214
+Demographics,Age Group,80+,All COVID Vaccines,NA,0.1457
+Demographics,Percent of Colorado Population,0-9,NA,NA,0.1161
+Demographics,Percent of Colorado Population,10-19,NA,NA,0.1301
+Demographics,Percent of Colorado Population,20-29,NA,NA,0.1466
+Demographics,Percent of Colorado Population,30-39,NA,NA,0.146
+Demographics,Percent of Colorado Population,40-49,NA,NA,0.1298
+Demographics,Percent of Colorado Population,50-59,NA,NA,0.1248
+Demographics,Percent of Colorado Population,60-69,NA,NA,0.1104
+Demographics,Percent of Colorado Population,70-79,NA,NA,0.0644
+Demographics,Percent of Colorado Population,80+,NA,NA,0.032
+Demographics,Percent of Colorado Population,American Indian or Alaska Native,NA,NA,0.0056
+Demographics,Percent of Colorado Population,Asian,NA,NA,0.0312
+Demographics,Percent of Colorado Population,Black or African American,NA,NA,0.0392
+Demographics,Percent of Colorado Population,Female,NA,NA,0.4996
+Demographics,Percent of Colorado Population,"Hispanic, All Races",NA,NA,0.2169
+Demographics,Percent of Colorado Population,Male,NA,NA,0.5004
+Demographics,Percent of Colorado Population,Multiple Races - Non Hispanic,NA,NA,0.0265
+Demographics,Percent of Colorado Population,Native Hawaiian or Other Pacific Islander,NA,NA,0.0012
+Demographics,Percent of Colorado Population,Other,NA,NA,0.0019
+Demographics,Percent of Colorado Population,White - Non Hispanic,NA,NA,0.6776
+Demographics,Race and Ethnicity,American Indian or Alaskan Native - Non Hispanic,All COVID Vaccines,NA,0.0044
+Demographics,Race and Ethnicity,Asian - Non Hispanic,All COVID Vaccines,NA,0.0174
+Demographics,Race and Ethnicity,Black or African American - Non Hispanic,All COVID Vaccines,NA,0.0191
+Demographics,Race and Ethnicity,"Hispanic, All Races",All COVID Vaccines,NA,0.047
+Demographics,Race and Ethnicity,Multi Race - Non Hispanic,All COVID Vaccines,NA,0.0153
+Demographics,Race and Ethnicity,Native Hawaiian or Other Pacific Islander - Non Hispanic,All COVID Vaccines,NA,0.0019
+Demographics,Race and Ethnicity,Other,All COVID Vaccines,NA,0.0017
+Demographics,Race and Ethnicity,Unknown,All COVID Vaccines,NA,0.1823
+Demographics,Race and Ethnicity,White - Non Hispanic,All COVID Vaccines,NA,0.7103
+Demographics,Sex,Female,All COVID Vaccines,NA,0.6158
+Demographics,Sex,Male,All COVID Vaccines,NA,0.382
+Demographics,Sex,Unknown,All COVID Vaccines,NA,0.0017
