@@ -16,10 +16,10 @@ db_creds = sys.argv[1]
 conn = psycopg2.connect(db_creds)
 cur = conn.cursor()
 
-sql = "CREATE TABLE cases (reporting_date date PRIMARY KEY, positive integer, hospitalized_currently integer, death_confirmed integer, positive_increase integer, death_increase integer, hospitalized_increase integer);"
+sql = "CREATE TABLE IF NOT EXISTS cases (reporting_date date PRIMARY KEY, positive integer, hospitalized_currently integer, death_confirmed integer, positive_increase integer, death_increase integer, hospitalized_increase integer);"
 cur.execute(sql)
 
-sql = "CREATE TABLE vaccines (reporting_date date PRIMARY KEY, daily_qty integer, daily_cumulative integer);"
+sql = "CREATE TABLE IF NOT EXISTS vaccines (reporting_date date PRIMARY KEY, daily_qty integer, daily_cumulative integer);"
 cur.execute(sql)
 
 conn.commit()

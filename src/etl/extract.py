@@ -35,7 +35,7 @@ def extract_case_data(date):
 def get_raw_case_data(date):
     url = f"https://api.covidtracking.com/v1/states/co/{date}.json"
     response = requests.get(url)
-    return response.json
+    return response.json()
 
 
 def save_raw_case_data(date, data):

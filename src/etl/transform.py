@@ -14,8 +14,6 @@ from src.etl.utils import yesterday_formatted, get_data, save_data
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-s3 = boto3.client("s3")
-
 BUCKET = os.getenv("S3_BUCKET", sys.argv[1])
 
 
