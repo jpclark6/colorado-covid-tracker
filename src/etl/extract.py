@@ -23,7 +23,7 @@ def handler(event=None, context=None, date=None):
     extract_case_data(date)
     extract_vaccine_data(date)
     return "Success"
-    
+
 
 def extract_case_data(date):
     date = date or yesterday_formatted()  # yyyymmdd
@@ -49,13 +49,13 @@ def extract_vaccine_data(date):
 
 
 def get_raw_vaccine_data():
-    res = requests.get('https://covid19.colorado.gov/vaccine-data-dashboard')
+    res = requests.get("https://covid19.colorado.gov/vaccine-data-dashboard")
     return res.content
 
 
 def save_raw_vaccine_data(date, data):
     raw_data = io.BytesIO(data)
-    s3_filename = f'raw_vaccine_data/{yesterday_formatted()}.html'
+    s3_filename = f"raw_vaccine_data/{yesterday_formatted()}.html"
     s3.upload_fileobj(raw_data, BUCKET, s3_filename)
 
 

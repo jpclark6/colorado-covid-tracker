@@ -78,30 +78,32 @@ def clean_cases_data(raw_data):
 
 
 def clean_vaccine_data(dom):
-    '''
+    """
     With data only available as html doc the parsing
     gets messy. This finds a known value in a table,
     then grabs additional values based on the order
     of the values and the offset from original value
-    '''
-    cells = dom.split('<td')
+    """
+    cells = dom.split("<td")
     results = {}
     cell_location_offsets = [
-        {'loc': 1, 'type': 'people_immunized_one_dose'},
-        {'loc': 3, 'type': 'people_immunized_two_doses'},
-        {'loc': 5, 'type': 'moderna_doses'},
-        {'loc': 7, 'type': 'pfizer_doses'},
+        {"loc": 1, "type": "people_immunized_one_dose"},
+        {"loc": 3, "type": "people_immunized_two_doses"},
+        {"loc": 5, "type": "moderna_doses"},
+        {"loc": 7, "type": "pfizer_doses"},
     ]
 
     def html_to_number(sentence):
-        return int((sentence.split('>'))[1].split('<')[0].replace(',', '')) # "123,456" => 123456
+        return int(
+            (sentence.split(">"))[1].split("<")[0].replace(",", "")
+        )  # "123,456" => 123456
 
     for i, text in enumerate(cells):
-        if 'People immunized with one dose' in text:
+        if "People immunized with one dose" in text:
             for cell_location in cell_location_offsets:
-                text_with_value = cells[i + cell_location['loc']]
+                text_with_value = cells[i + cell_location["loc"]]
                 value = html_to_number(text_with_value)
-                results[cell_location['type']] = value
+                results[cell_location["type"]] = value
 
     return results
 

@@ -7,7 +7,7 @@ import boto3
 
 
 app = FlaskLambda(__name__)
-client = boto3.client('ssm')
+client = boto3.client("ssm")
 
 DB_CREDENTIALS = os.getenv("DB_CREDENTIALS", None)
 # DB_CREDENTIALS = client.get_parameter(Name='CovidDatabaseURL')['Parameter']['Value']
@@ -15,8 +15,16 @@ DB_CREDENTIALS = os.getenv("DB_CREDENTIALS", None)
 
 @app.route("/cases_history/")
 def daily_cases():
-    table = 'cases'
-    values = ['reporting_date', 'positive', 'hospitalized_currently', 'death_confirmed', 'positive_increase', 'death_increase', 'hospitalized_increase']
+    table = "cases"
+    values = [
+        "reporting_date",
+        "positive",
+        "hospitalized_currently",
+        "death_confirmed",
+        "positive_increase",
+        "death_increase",
+        "hospitalized_increase",
+    ]
     formatted_data = get_formatted_daily_data(table, values)
 
     return jsonify(formatted_data)
@@ -24,11 +32,17 @@ def daily_cases():
 
 @app.route("/cases_average/")
 def daily_averaged_cases():
-    '''
+    """
     Weekly rolling average
-    '''
-    table = 'cases'
-    values = ['reporting_date', 'hospitalized_currently', 'positive_increase', 'death_increase', 'hospitalized_increase']
+    """
+    table = "cases"
+    values = [
+        "reporting_date",
+        "hospitalized_currently",
+        "positive_increase",
+        "death_increase",
+        "hospitalized_increase",
+    ]
     formatted_data = get_formatted_averaged_data(table, values)
 
     return jsonify(formatted_data)
@@ -36,8 +50,8 @@ def daily_averaged_cases():
 
 @app.route("/vaccines_history/")
 def daily_vaccines():
-    table = 'vaccines'
-    values = ['reporting_date', 'daily_qty', 'daily_cumulative']
+    table = "vaccines"
+    values = ["reporting_date", "daily_qty", "daily_cumulative"]
     formatted_data = get_formatted_daily_data(table, values)
 
     return jsonify(formatted_data)
@@ -45,11 +59,11 @@ def daily_vaccines():
 
 @app.route("/vaccines_average/")
 def daily_averaged_vaccines():
-    '''
+    """
     Weekly rolling average
-    '''
-    table = 'vaccines'
-    values = ['reporting_date', 'daily_qty']
+    """
+    table = "vaccines"
+    values = ["reporting_date", "daily_qty"]
     formatted_data = get_formatted_averaged_data(table, values)
 
     return jsonify(formatted_data)
@@ -69,8 +83,10 @@ def get_formatted_daily_data(table, values):
 def get_formatted_averaged_data(table, values):
     try:
         ave_sql = []
-        for value in values[1:]: # don't average reporting_date
-            ave_sql.append(f'AVG({value}) OVER(ORDER BY reporting_date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS avg_{value}')
+        for value in values[1:]:  # don't average reporting_date
+            ave_sql.append(
+                f"AVG({value}) OVER(ORDER BY reporting_date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS avg_{value}"
+            )
         sql = f'SELECT reporting_date, {", ".join(ave_sql)} FROM {table} ORDER BY reporting_date DESC;'
         data = fetch_data(sql)
         formatted_data = format_data(data, values)
@@ -85,7 +101,7 @@ def fetch_data(sql):
     cur.execute(sql)
     data = cur.fetchall()
     conn.close()
-    return data  
+    return data
 
 
 def format_data(data, values):
@@ -94,8 +110,8 @@ def format_data(data, values):
         new_data = {}
         for i, value in enumerate(values):
             new_data[value] = entry[i]
-            if value == 'reporting_date':
-                # hacky way to get date format to not 
+            if value == "reporting_date":
+                # hacky way to get date format to not
                 # fail when creating json later on
                 new_data[value] = str(entry[i])
         formatted_data.append(new_data)

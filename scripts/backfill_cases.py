@@ -6,8 +6,8 @@ import os
 import requests
 import boto3
 
-os.setenvvar('S3_BUCKET', sys.argv[1])
-os.setenvvar('DB_CREDENTIALS', sys.argv[4])
+os.setenvvar("S3_BUCKET", sys.argv[1])
+os.setenvvar("DB_CREDENTIALS", sys.argv[4])
 
 from src.etl.extract import extract_case_data
 from src.etl.transform import transform_case_data

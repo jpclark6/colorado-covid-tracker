@@ -41,6 +41,7 @@ def load_vaccine_data(date):
     clean_data = get_data(s3_filename, BUCKET)
     save_vaccine_data_to_db(date, clean_data)
 
+
 def save_case_data_to_db(date, clean_data):
     sql_date = date_to_sql_date(date)
 

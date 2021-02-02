@@ -33,22 +33,22 @@ Resources:
           DB_CREDENTIALS: !Ref DbCredentials
       Events:
         Cases:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Type: Api
           Properties:
             Path: /cases_history/
             Method: get
         AveCases:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Type: Api
           Properties:
             Path: /cases_average/
             Method: get
         Vaccines:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Type: Api
           Properties:
             Path: /vaccines_history/
             Method: get
         AveVaccines:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Type: Api
           Properties:
             Path: /vaccines_average/
             Method: get
@@ -144,3 +144,6 @@ Outputs:
   CoCovidFunctionIamRole:
     Description: "Implicit IAM Role created for Colorado Covid function"
     Value: !GetAtt CoCovidFunctionRole.Arn
+  CoCovidBucket:
+    Description: "Bucket used to store stack"
+    Value: !Ref S3Bucket
