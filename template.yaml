@@ -32,10 +32,25 @@ Resources:
         Variables:
           DB_CREDENTIALS: !Ref DbCredentials
       Events:
-        CoCovid:
+        Cases:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Path: /covid-data
+            Path: /cases_history/
+            Method: get
+        AveCases:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /cases_average/
+            Method: get
+        Vaccines:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /vaccines_history/
+            Method: get
+        AveVaccines:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /vaccines_average/
             Method: get
   
   RawDailyFunction:
@@ -122,7 +137,7 @@ Resources:
 Outputs:
   CoCovidApi:
     Description: "API Gateway endpoint URL for Prod stage for Colorado Covid function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/covid-data/"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/cases_history/"
   CoCovidFunction:
     Description: "Colorado Covid Lambda Function ARN"
     Value: !GetAtt CoCovidFunction.Arn

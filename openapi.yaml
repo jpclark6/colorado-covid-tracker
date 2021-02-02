@@ -7,7 +7,7 @@ servers:
   - url: <not hosted yet>
     description: API Gateway
 paths:
-  /covid-data:
+  /cases_history:
     get:
       summary: Returns a list of covid case and vaccine numbers by day
       responses:
