@@ -13,7 +13,7 @@ Parameters:
     Default: CovidDatabaseURL
 Globals:
   Function:
-    Timeout: 3
+    Timeout: 6
     Environment:
       Variables:
         BUCKET_NAME: !Ref S3Bucket

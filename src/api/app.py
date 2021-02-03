@@ -4,13 +4,14 @@ from flask_lambda import FlaskLambda
 from flask import jsonify
 import psycopg2
 import boto3
+import decimal
 
 
 app = FlaskLambda(__name__)
 client = boto3.client("ssm")
 
-DB_CREDENTIALS = os.getenv("DB_CREDENTIALS", None)
-# DB_CREDENTIALS = client.get_parameter(Name='CovidDatabaseURL')['Parameter']['Value']
+# DB_CREDENTIALS = os.getenv("DB_CREDENTIALS", None)
+DB_CREDENTIALS = client.get_parameter(Name='CovidDatabaseURL')['Parameter']['Value']
 
 
 @app.route("/cases_history/")
@@ -77,7 +78,7 @@ def get_formatted_daily_data(table, values):
     except Exception as e:
         print("Encountered an error", e)
 
-    return jsonify(formatted_data)
+    return formatted_data
 
 
 def get_formatted_averaged_data(table, values):
@@ -114,6 +115,8 @@ def format_data(data, values):
                 # hacky way to get date format to not
                 # fail when creating json later on
                 new_data[value] = str(entry[i])
+            if isinstance(entry[i], decimal.Decimal):
+                new_data[value] = round(float(entry[i]), 2) # psycopg2 returns Decimal, which fails at json.dumps
         formatted_data.append(new_data)
     return formatted_data
 
