@@ -9,25 +9,29 @@ import requests
 import boto3
 import psycopg2
 
-from src.etl.utils import yesterday_formatted, get_data, date_to_sql_date
-
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 s3 = boto3.client("s3")
+ssm = boto3.client("ssm")
 
-BUCKET = os.getenv("S3_BUCKET", sys.argv[1])
-DB_CREDENTIALS = os.getenv("DB_CREDENTIALS", sys.argv[2])
+try:
+    backup_bucket = sys.argv[1]
+except IndexError:
+    backup_bucket = None
+
+BUCKET = os.getenv("S3_BUCKET", backup_bucket)
+DB_CREDENTIALS = ssm.get_parameter(Name='CovidDatabaseURL')['Parameter']['Value']
 
 
 def handler(event=None, context=None, date=None):
-    load_case_data(date, BUCKET)
-    load_vaccine_data(date, BUCKET)
+    load_case_data(date)
+    load_vaccine_data(date)
 
 
 def load_case_data(date):
-    date = date or yesterday_formatted()  # yyyymmdd
+    date = date or today_formatted()  # yyyymmdd
 
     s3_filename = f"cleaned_cases_data/{date}.json"
     clean_data = get_data(s3_filename, BUCKET)
@@ -35,7 +39,7 @@ def load_case_data(date):
 
 
 def load_vaccine_data(date):
-    date = date or yesterday_formatted()  # yyyymmdd
+    date = date or today_formatted()  # yyyymmdd
 
     s3_filename = f"cleaned_vaccine_data/{date}.json"
     clean_data = get_data(s3_filename, BUCKET)
@@ -67,11 +71,22 @@ def save_case_data_to_db(date, clean_data):
 def save_vaccine_data_to_db(date, clean_data):
     sql_date = date_to_sql_date(date)
 
-    sql_data = (
-        sql_date,
-        clean_data["daily_qty"],
-        clean_data["daily_cumulative"],
-    )
+    try:
+        backup_bucket = sys.argv[1]
+        sql_data = (
+            sql_date,
+            clean_data["daily_qty"],
+            clean_data["daily_cumulative"],
+        )
+    except IndexError:
+        # Get previous day's cumulative value
+        # calculate today's cumulative value
+        # find difference, save to daily_qty
+        sql_data = (
+            sql_date,
+            0,
+            clean_data["people_immunized_one_dose"] + clean_data["people_immunized_two_doses"],
+        )
 
     sql = """
         INSERT INTO vaccines (reporting_date, daily_qty, daily_cumulative)
@@ -90,6 +105,25 @@ def save_to_db(sql, sql_data):
     conn.commit()
     conn.close()
 
+
+### Take out eventually, make module
+def today_formatted():
+    today = datetime.today() - timedelta(hours=7)
+    return today.strftime("%Y%m%d")  # yyyymmdd
+    
+    
+def get_data(s3_filename, bucket):
+    response = s3.get_object(
+        Bucket=bucket,
+        Key=s3_filename,
+    )
+    return json.loads(response["Body"].read())
+    
+    
+def date_to_sql_date(date):
+    date_time = datetime.strptime(date, "%Y%m%d")
+    return date_time.strftime("%Y-%m-%d")
+###
 
 if __name__ == "__main__":
     """

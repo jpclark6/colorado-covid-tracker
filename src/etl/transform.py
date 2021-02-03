@@ -8,13 +8,18 @@ import sys
 import requests
 import boto3
 
-from src.etl.utils import yesterday_formatted, get_data, save_data
 
+s3 = boto3.client("s3")
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-BUCKET = os.getenv("S3_BUCKET", sys.argv[1])
+try:
+    backup_bucket = sys.argv[1]
+except IndexError:
+    backup_bucket = None
+
+BUCKET = os.getenv("S3_BUCKET", backup_bucket)
 
 
 def handler(event=None, context=None, date=None):
@@ -24,7 +29,7 @@ def handler(event=None, context=None, date=None):
 
 
 def transform_case_data(date):
-    date = date or yesterday_formatted()  # yyyymmdd
+    date = date or today_formatted()  # yyyymmdd
 
     raw_data = get_raw_case_data(date)
     cleaned_data = clean_cases_data(raw_data)
@@ -32,7 +37,7 @@ def transform_case_data(date):
 
 
 def transform_vaccine_data(date):
-    date = date or yesterday_formatted()  # yyyymmdd
+    date = date or today_formatted()  # yyyymmdd
 
     raw_data = get_raw_vaccine_data(date)
     cleaned_data = clean_vaccine_data(raw_data)
@@ -46,7 +51,7 @@ def get_raw_case_data(date):
 
 def get_raw_vaccine_data(date):
     s3_filename = f"raw_vaccine_data/{date}.html"
-    return get_data(s3_filename, BUCKET)
+    return get_html_data(s3_filename, BUCKET)
 
 
 def save_cleaned_case_data(date, cleaned_data):
@@ -104,6 +109,34 @@ def clean_vaccine_data(dom):
                 results[cell_location["type"]] = value
 
     return results
+
+
+### Take out eventually, make module
+def today_formatted():
+    today = datetime.today() - timedelta(hours=7)
+    return today.strftime("%Y%m%d")  # yyyymmdd
+
+
+def get_data(s3_filename, bucket):
+    response = s3.get_object(
+        Bucket=bucket,
+        Key=s3_filename,
+    )
+    return json.loads(response["Body"].read())
+
+
+def get_html_data(s3_filename, bucket):
+    response = s3.get_object(
+        Bucket=bucket,
+        Key=s3_filename,
+    )
+    return response["Body"].read().decode('utf-8')
+
+
+def save_data(s3_filename, data, bucket):
+    s3_data = io.BytesIO(json.dumps(data).encode("utf-8"))
+    s3.upload_fileobj(s3_data, bucket, s3_filename)
+###
 
 
 if __name__ == "__main__":

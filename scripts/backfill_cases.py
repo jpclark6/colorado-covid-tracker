@@ -32,7 +32,7 @@ def loop_through_dates(start_date, end_date):
     if int(start_date) < 20200304:
         print("No data at start date")
         return
-    if end >= datetime.today():
+    if end > datetime.today():
         print("No data available after yesterday's date")
         return
     if start_date > end_date:

@@ -8,16 +8,19 @@ import sys
 import requests
 import boto3
 
-from src.etl.utils import yesterday_formatted, save_data
-
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-s3 = boto3.client("s3")
+try:
+    backup_bucket = sys.argv[1]
+except IndexError:
+    backup_bucket = None
 
-BUCKET = os.getenv("S3_BUCKET", sys.argv[1])
+BUCKET = os.getenv("S3_BUCKET", backup_bucket)
 
+
+s3_client = boto3.client("s3")
 
 def handler(event=None, context=None, date=None):
     extract_case_data(date)
@@ -26,7 +29,7 @@ def handler(event=None, context=None, date=None):
 
 
 def extract_case_data(date):
-    date = date or yesterday_formatted()  # yyyymmdd
+    date = date or today_formatted()  # yyyymmdd
 
     raw_data = get_raw_case_data(date)
     save_raw_case_data(date, raw_data)
@@ -44,6 +47,8 @@ def save_raw_case_data(date, data):
 
 
 def extract_vaccine_data(date):
+    date = date or today_formatted()  # yyyymmdd
+
     raw_data = get_raw_vaccine_data()
     save_raw_vaccine_data(date, raw_data)
 
@@ -55,8 +60,20 @@ def get_raw_vaccine_data():
 
 def save_raw_vaccine_data(date, data):
     raw_data = io.BytesIO(data)
-    s3_filename = f"raw_vaccine_data/{yesterday_formatted()}.html"
-    s3.upload_fileobj(raw_data, BUCKET, s3_filename)
+    s3_filename = f"raw_vaccine_data/{today_formatted()}.html"
+    s3_client.upload_fileobj(raw_data, BUCKET, s3_filename)
+
+
+### Take out eventually, make module
+def today_formatted():
+    today = datetime.today() - timedelta(hours=7)
+    return today.strftime("%Y%m%d")  # yyyymmdd
+
+
+def save_data(s3_filename, data, bucket):
+    s3_data = io.BytesIO(json.dumps(data).encode("utf-8"))
+    s3_client.upload_fileobj(s3_data, bucket, s3_filename)
+###
 
 
 if __name__ == "__main__":

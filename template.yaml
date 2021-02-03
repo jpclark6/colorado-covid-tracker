@@ -16,7 +16,7 @@ Globals:
     Timeout: 6
     Environment:
       Variables:
-        BUCKET_NAME: !Ref S3Bucket
+        S3_BUCKET: !Ref S3Bucket
 
 Resources:
   CoCovidFunction:
@@ -26,8 +26,8 @@ Resources:
       Handler: app.app
       Runtime: python3.8
       Policies:
-      - AmazonS3FullAccess
-      - AmazonSSMReadOnlyAccess
+        - AmazonS3FullAccess
+        - AmazonSSMReadOnlyAccess
       Environment:
         Variables:
           DB_CREDENTIALS: !Ref DbCredentials
@@ -60,8 +60,7 @@ Resources:
       Handler: extract.handler
       Runtime: python3.8
       Policies:
-      - AmazonS3FullAccess
-      - AmazonSSMReadOnlyAccess
+        - AmazonS3FullAccess
       Events:
         EEvent:
           Type: Schedule
@@ -75,8 +74,8 @@ Resources:
       Handler: transform.handler
       Runtime: python3.8
       Policies:
-      - AmazonS3FullAccess
-      - AmazonSSMReadOnlyAccess
+        - AmazonS3FullAccess
+        - AmazonSSMReadOnlyAccess
       Events:
         TEvent:
           Type: Schedule
