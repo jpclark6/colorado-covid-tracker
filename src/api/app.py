@@ -11,7 +11,7 @@ app = FlaskLambda(__name__)
 client = boto3.client("ssm")
 
 # DB_CREDENTIALS = os.getenv("DB_CREDENTIALS", None)
-DB_CREDENTIALS = client.get_parameter(Name="CovidDatabaseURL")["Parameter"]["Value"]
+DB_CREDENTIALS = client.get_parameter(Name="/colorado-covid/db_creds")["Parameter"]["Value"]
 
 
 @app.route("/cases_history/")

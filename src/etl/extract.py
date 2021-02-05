@@ -48,7 +48,7 @@ def save_raw_case_data(date, data):
 
 
 def extract_vaccine_data(date):
-    date = date or today_formatted()  # yyyymmdd
+    date = date or yesterday_formatted()  # yyyymmdd
 
     raw_data = get_raw_vaccine_data()
     save_raw_vaccine_data(date, raw_data)
