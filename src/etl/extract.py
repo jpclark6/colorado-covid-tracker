@@ -19,12 +19,13 @@ except IndexError:
 
 BUCKET = os.getenv("S3_BUCKET", backup_bucket)
 
-
 s3_client = boto3.client("s3")
+
 
 def handler(event=None, context=None, date=None):
     extract_case_data(date)
     extract_vaccine_data(date)
+    start_next_function()
     return "Success"
 
 
@@ -60,7 +61,7 @@ def get_raw_vaccine_data():
 
 def save_raw_vaccine_data(date, data):
     raw_data = io.BytesIO(data)
-    s3_filename = f"raw_vaccine_data/{today_formatted()}.html"
+    s3_filename = f"raw_vaccine_data/{date}.html"
     s3_client.upload_fileobj(raw_data, BUCKET, s3_filename)
 
 
@@ -70,10 +71,28 @@ def today_formatted():
     return today.strftime("%Y%m%d")  # yyyymmdd
 
 
+def yesterday_formatted():
+    today = datetime.today() - timedelta(days=1, hours=7)
+    return today.strftime("%Y%m%d")  # yyyymmdd
+
+
 def save_data(s3_filename, data, bucket):
     s3_data = io.BytesIO(json.dumps(data).encode("utf-8"))
     s3_client.upload_fileobj(s3_data, bucket, s3_filename)
+
+
 ###
+
+
+def start_next_function():
+    lambda_client = boto3.client("lambda")
+    print("Getting function name")
+    function_name = os.getenv("NEXT_FUNCTION")
+    print("Function name:", function_name)
+    response = lambda_client.invoke(
+        FunctionName=function_name,
+        InvocationType="Event",
+    )
 
 
 if __name__ == "__main__":

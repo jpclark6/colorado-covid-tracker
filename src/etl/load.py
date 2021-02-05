@@ -22,7 +22,9 @@ except IndexError:
     backup_bucket = None
 
 BUCKET = os.getenv("S3_BUCKET", backup_bucket)
-DB_CREDENTIALS = ssm.get_parameter(Name='CovidDatabaseURL')['Parameter']['Value']
+DB_CREDENTIALS = ssm.get_parameter(Name="/colorado-covid/db_creds")["Parameter"][
+    "Value"
+]  # make env var
 
 
 def handler(event=None, context=None, date=None):
@@ -39,7 +41,7 @@ def load_case_data(date):
 
 
 def load_vaccine_data(date):
-    date = date or today_formatted()  # yyyymmdd
+    date = date or yesterday_formatted()  # yyyymmdd
 
     s3_filename = f"cleaned_vaccine_data/{date}.json"
     clean_data = get_data(s3_filename, BUCKET)
@@ -78,14 +80,19 @@ def save_vaccine_data_to_db(date, clean_data):
             clean_data["daily_qty"],
             clean_data["daily_cumulative"],
         )
-    except IndexError:
+    except IndexError:  # if running automatically with different formatted data
         # Get previous day's cumulative value
         # calculate today's cumulative value
         # find difference, save to daily_qty
+        total_cumulative = (
+            clean_data["people_immunized_one_dose"]
+            + clean_data["people_immunized_two_doses"]
+        )
+        daily = total_cumulative - fetch_prev_days_vaccine_cumulative()
         sql_data = (
             sql_date,
-            0,
-            clean_data["people_immunized_one_dose"] + clean_data["people_immunized_two_doses"],
+            daily,
+            total_cumulative,
         )
 
     sql = """
@@ -106,23 +113,41 @@ def save_to_db(sql, sql_data):
     conn.close()
 
 
+def fetch_prev_days_vaccine_cumulative():
+    sql = "SELECT * FROM vaccines ORDER BY reporting_date DESC LIMIT 1;"
+    conn = psycopg2.connect(DB_CREDENTIALS)
+    cur = conn.cursor()
+    cur.execute(sql)
+    data = cur.fetchone()
+    conn.close()
+    value = data[2]
+    return value
+
+
 ### Take out eventually, make module
 def today_formatted():
     today = datetime.today() - timedelta(hours=7)
     return today.strftime("%Y%m%d")  # yyyymmdd
-    
-    
+
+
+def yesterday_formatted():
+    today = datetime.today() - timedelta(days=1, hours=7)
+    return today.strftime("%Y%m%d")  # yyyymmdd
+
+
 def get_data(s3_filename, bucket):
     response = s3.get_object(
         Bucket=bucket,
         Key=s3_filename,
     )
     return json.loads(response["Body"].read())
-    
-    
+
+
 def date_to_sql_date(date):
     date_time = datetime.strptime(date, "%Y%m%d")
     return date_time.strftime("%Y-%m-%d")
+
+
 ###
 
 if __name__ == "__main__":

@@ -11,7 +11,7 @@ app = FlaskLambda(__name__)
 client = boto3.client("ssm")
 
 # DB_CREDENTIALS = os.getenv("DB_CREDENTIALS", None)
-DB_CREDENTIALS = client.get_parameter(Name='CovidDatabaseURL')['Parameter']['Value']
+DB_CREDENTIALS = client.get_parameter(Name="CovidDatabaseURL")["Parameter"]["Value"]
 
 
 @app.route("/cases_history/")
@@ -116,7 +116,9 @@ def format_data(data, values):
                 # fail when creating json later on
                 new_data[value] = str(entry[i])
             if isinstance(entry[i], decimal.Decimal):
-                new_data[value] = round(float(entry[i]), 2) # psycopg2 returns Decimal, which fails at json.dumps
+                new_data[value] = round(
+                    float(entry[i]), 2
+                )  # psycopg2 returns Decimal, which fails at json.dumps
         formatted_data.append(new_data)
     return formatted_data
 

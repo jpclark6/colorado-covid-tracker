@@ -25,6 +25,7 @@ BUCKET = os.getenv("S3_BUCKET", backup_bucket)
 def handler(event=None, context=None, date=None):
     transform_case_data(date)
     transform_vaccine_data(date)
+    start_next_function()
     return "Success"
 
 
@@ -37,7 +38,7 @@ def transform_case_data(date):
 
 
 def transform_vaccine_data(date):
-    date = date or today_formatted()  # yyyymmdd
+    date = date or yesterday_formatted()  # yyyymmdd
 
     raw_data = get_raw_vaccine_data(date)
     cleaned_data = clean_vaccine_data(raw_data)
@@ -117,6 +118,11 @@ def today_formatted():
     return today.strftime("%Y%m%d")  # yyyymmdd
 
 
+def yesterday_formatted():
+    today = datetime.today() - timedelta(days=1, hours=7)
+    return today.strftime("%Y%m%d")  # yyyymmdd
+
+
 def get_data(s3_filename, bucket):
     response = s3.get_object(
         Bucket=bucket,
@@ -130,13 +136,23 @@ def get_html_data(s3_filename, bucket):
         Bucket=bucket,
         Key=s3_filename,
     )
-    return response["Body"].read().decode('utf-8')
+    return response["Body"].read().decode("utf-8")
 
 
 def save_data(s3_filename, data, bucket):
     s3_data = io.BytesIO(json.dumps(data).encode("utf-8"))
     s3.upload_fileobj(s3_data, bucket, s3_filename)
+
+
 ###
+
+
+def start_next_function():
+    lambda_client = boto3.client("lambda")
+    response = lambda_client.invoke(
+        FunctionName=os.getenv("NEXT_FUNCTION"),
+        InvocationType="Event",
+    )
 
 
 if __name__ == "__main__":

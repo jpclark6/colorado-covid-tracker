@@ -10,7 +10,7 @@ Parameters:
   DbCredentials:
     Type: 'AWS::SSM::Parameter::Value<String>'
     Description: Database creds in the format postgres://<user>:<pw>@<host>/<db>
-    Default: CovidDatabaseURL
+    Default: /colorado-covid/db_creds
 Globals:
   Function:
     Timeout: 6
@@ -61,11 +61,15 @@ Resources:
       Runtime: python3.8
       Policies:
         - AmazonS3FullAccess
+        - AWSLambdaFullAccess
+      Environment:
+        Variables:
+          NEXT_FUNCTION: !Ref TransformDailyFunction
       Events:
         EEvent:
           Type: Schedule
           Properties:
-            Schedule: cron(0 3 * * ? *)
+            Schedule: cron(0 1 * * ? *)
 
   TransformDailyFunction:
     Type: AWS::Serverless::Function
@@ -76,11 +80,10 @@ Resources:
       Policies:
         - AmazonS3FullAccess
         - AmazonSSMReadOnlyAccess
-      Events:
-        TEvent:
-          Type: Schedule
-          Properties:
-            Schedule: cron(2 3 * * ? *)
+        - AWSLambdaFullAccess
+      Environment:
+        Variables:
+          NEXT_FUNCTION: !Ref LoadDailyFunction
 
   LoadDailyFunction:
     Type: AWS::Serverless::Function
@@ -94,11 +97,6 @@ Resources:
       Environment:
         Variables:
           DB_CREDENTIALS: !Ref DbCredentials
-      Events:
-        LEvent:
-          Type: Schedule
-          Properties:
-            Schedule: cron(4 3 * * ? *)
 
   AlarmTopic:
     Type: AWS::SNS::Topic
@@ -134,15 +132,18 @@ Resources:
     DeletionPolicy: Retain
 
 Outputs:
-  CoCovidApi:
+  CoCovidApiHistory:
     Description: "API Gateway endpoint URL for Prod stage for Colorado Covid function"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/cases_history/"
-  CoCovidFunction:
-    Description: "Colorado Covid Lambda Function ARN"
-    Value: !GetAtt CoCovidFunction.Arn
-  CoCovidFunctionIamRole:
-    Description: "Implicit IAM Role created for Colorado Covid function"
-    Value: !GetAtt CoCovidFunctionRole.Arn
+  CoCovidApiDaily:
+    Description: "API Gateway endpoint URL for Prod stage for Colorado Covid function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/cases_daily/"
+  CoCovidApiVaccineHistory:
+    Description: "API Gateway endpoint URL for Prod stage for Colorado Covid function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/vaccines_history/"
+  CoCovidApiVaccineHistory:
+    Description: "API Gateway endpoint URL for Prod stage for Colorado Covid function" 
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/vaccines_daily/"
   CoCovidBucket:
     Description: "Bucket used to store stack"
     Value: !Ref S3Bucket
