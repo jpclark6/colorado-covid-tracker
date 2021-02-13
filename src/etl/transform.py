@@ -29,14 +29,6 @@ def handler(event=None, context=None, date=None):
     return "Success"
 
 
-def transform_case_data(date):
-    date = date or today_formatted()  # yyyymmdd
-
-    raw_data = get_raw_case_data(date)
-    cleaned_data = clean_cases_data(raw_data)
-    save_cleaned_case_data(date, cleaned_data)
-
-
 def transform_vaccine_data(date):
     date = date or yesterday_formatted()  # yyyymmdd
 
@@ -45,9 +37,12 @@ def transform_vaccine_data(date):
     save_cleaned_vaccine_data(date, cleaned_data)
 
 
-def get_raw_case_data(date):
-    s3_filename = f"raw_cases_data/{date}.json"
-    return get_data(s3_filename, BUCKET)
+def transform_case_data(date):
+    date = date or today_formatted()  # yyyymmdd
+
+    raw_data = get_raw_cases_data(date)
+    cleaned_data = clean_cases_data(raw_data)
+    save_cleaned_case_data(date, cleaned_data)
 
 
 def get_raw_vaccine_data(date):
@@ -55,9 +50,9 @@ def get_raw_vaccine_data(date):
     return get_html_data(s3_filename, BUCKET)
 
 
-def save_cleaned_case_data(date, cleaned_data):
-    s3_filename = f"cleaned_cases_data/{date}.json"
-    save_data(s3_filename, cleaned_data, BUCKET)
+def get_raw_cases_data(date):
+    s3_filename = f"raw_cases_data/{date}.json"
+    return get_data(s3_filename, BUCKET)
 
 
 def save_cleaned_vaccine_data(date, cleaned_data):
@@ -65,20 +60,9 @@ def save_cleaned_vaccine_data(date, cleaned_data):
     save_data(s3_filename, cleaned_data, BUCKET)
 
 
-def clean_cases_data(raw_data):
-    fields_to_keep = [
-        "deathConfirmed",
-        "deathIncrease",
-        "hospitalizedCurrently",
-        "hospitalizedIncrease",
-        "positive",
-        "positiveIncrease",
-    ]
-    cleaned = {}
-    for k in raw_data:
-        if k in fields_to_keep:
-            cleaned[k] = raw_data[k]
-    return cleaned
+def save_cleaned_case_data(date, cleaned_data):
+    s3_filename = f"cleaned_cases_data/{date}.json"
+    save_data(s3_filename, cleaned_data, BUCKET)
 
 
 def clean_vaccine_data(dom):
@@ -112,6 +96,37 @@ def clean_vaccine_data(dom):
     return results
 
 
+def clean_cases_data(raw_data):
+    daily_data = raw_data["features"]
+    days = []
+    for day in daily_data:
+        properties = day["properties"]
+        if not properties["Date"]:
+            continue
+        data = {
+            "reportingDate": reporting_date_to_formatted(properties["Date"]),
+            "positive": properties["Cases"],
+            "tested": properties["Tested"],
+            "deathConfirmed": properties["Deaths"],
+            "hospitalizations": properties["Hosp"],
+        }
+        days.append(data)
+    days = sorted(days, key = lambda i: i['reportingDate'])
+    total_days = len(days)
+    for i in range(total_days):
+        if i == 0:
+            days[i]["positiveIncrease"] = days[i]["positive"]
+            days[i]["deathIncrease"] = days[i]["deathConfirmed"]
+            days[i]["hospitalizedIncrease"] = days[i]["hospitalizations"]
+            days[i]["testedIncrease"] = days[i]["tested"]
+        else:
+            days[i]["positiveIncrease"] = days[i]["positive"] - days[i - 1]["positive"]
+            days[i]["deathIncrease"] = days[i]["deathConfirmed"] - days[i - 1]["deathConfirmed"]
+            days[i]["hospitalizedIncrease"] = days[i]["hospitalizations"] - days[i - 1]["hospitalizations"]
+            days[i]["testedIncrease"] = days[i]["tested"] - days[i - 1]["tested"]
+    return days
+
+
 ### Take out eventually, make module
 def today_formatted():
     today = datetime.today() - timedelta(hours=7)
@@ -132,6 +147,7 @@ def get_data(s3_filename, bucket):
 
 
 def get_html_data(s3_filename, bucket):
+    bucket = 'test-covid-jpclark'
     response = s3.get_object(
         Bucket=bucket,
         Key=s3_filename,
@@ -144,6 +160,9 @@ def save_data(s3_filename, data, bucket):
     s3.upload_fileobj(s3_data, bucket, s3_filename)
 
 
+def reporting_date_to_formatted(date):
+    date_time = datetime.strptime(date, "%m/%d/%Y")
+    return date_time.strftime("%Y%m%d")
 ###
 
 

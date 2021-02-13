@@ -35,7 +35,7 @@ def handler(event=None, context=None, date=None):
 def load_case_data(date):
     date = date or today_formatted()  # yyyymmdd
 
-    s3_filename = f"cleaned_cases_data/{date}.json"
+    s3_filename = f"cleaned_cases_data_co/{date}.json"
     clean_data = get_data(s3_filename, BUCKET)
     save_case_data_to_db(date, clean_data)
 
@@ -49,25 +49,33 @@ def load_vaccine_data(date):
 
 
 def save_case_data_to_db(date, clean_data):
-    sql_date = date_to_sql_date(date)
+    conn = psycopg2.connect(DB_CREDENTIALS)
+    cur = conn.cursor()
 
-    sql_data = (
-        sql_date,
-        clean_data["positive"],
-        clean_data["hospitalizedCurrently"],
-        clean_data["deathConfirmed"],
-        clean_data["positiveIncrease"],
-        clean_data["deathIncrease"],
-        clean_data["hospitalizedIncrease"],
-    )
+    for day in clean_data:
+        sql_date = date_to_sql_date(date)
 
-    sql = """
-        INSERT INTO cases (reporting_date, positive, hospitalized_currently, death_confirmed, 
-        positive_increase, death_increase, hospitalized_increase)
-        VALUES (%s, %s, %s, %s, %s, %s, %s) ON CONFLICT DO NOTHING;
-    """
+        sql_data = (
+            date_to_sql_date(day["reportingDate"]),
+            day["positive"],
+            day["hospitalizations"],
+            day["deathConfirmed"],
+            day["positiveIncrease"],
+            day["deathIncrease"],
+            day["hospitalizedIncrease"],
+            day["tested"],
+            day["testedIncrease"],
+        )
 
-    save_to_db(sql, sql_data)
+        sql = """
+            INSERT INTO cases (reporting_date, positive, hospitalized_currently, death_confirmed, 
+            positive_increase, death_increase, hospitalized_increase, tested, tested_increase)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT DO NOTHING;
+        """
+
+        cur.execute(sql, sql_data)
+    conn.commit()
+    conn.close()
 
 
 def save_vaccine_data_to_db(date, clean_data):
@@ -81,23 +89,29 @@ def save_vaccine_data_to_db(date, clean_data):
             clean_data["daily_cumulative"],
         )
     except IndexError:  # if running automatically with different formatted data
-        # Get previous day's cumulative value
-        # calculate today's cumulative value
-        # find difference, save to daily_qty
         total_cumulative = (
             clean_data["people_immunized_one_dose"]
             + clean_data["people_immunized_two_doses"]
         )
-        daily = total_cumulative - fetch_prev_days_vaccine_cumulative()
+        yesterday_cases, one_dose_daily, two_doses_daily = fetch_prev_days_vaccine_cumulative()
+        daily = total_cumulative - yesterday_cases
+        one_dose_increase = clean_data["people_immunized_one_dose"] - one_dose_daily
+        two_doses_increase = clean_data["people_immunized_two_doses"] - two_doses_daily
+
         sql_data = (
             sql_date,
             daily,
             total_cumulative,
+            one_dose_increase,
+            clean_data["people_immunized_one_dose"],
+            two_doses_increase,
+            clean_data["people_immunized_two_doses"],
         )
 
     sql = """
-        INSERT INTO vaccines (reporting_date, daily_qty, daily_cumulative)
-        VALUES (%s, %s, %s) ON CONFLICT DO NOTHING;
+        INSERT INTO vaccines (reporting_date, daily_qty, daily_cumulative, one_dose_increase, 
+        one_dose_total, two_doses_increase, two_doses_total)
+        VALUES (%s, %s, %s, %s, %s, %s, %s) ON CONFLICT DO NOTHING;
     """
 
     save_to_db(sql, sql_data)
@@ -113,6 +127,16 @@ def save_to_db(sql, sql_data):
     conn.close()
 
 
+def run_raw_sql(sql):
+    conn = psycopg2.connect(DB_CREDENTIALS)
+    cur = conn.cursor()
+
+    cur.execute(sql)
+
+    conn.commit()
+    conn.close()
+
+
 def fetch_prev_days_vaccine_cumulative():
     sql = "SELECT * FROM vaccines ORDER BY reporting_date DESC LIMIT 1;"
     conn = psycopg2.connect(DB_CREDENTIALS)
@@ -120,8 +144,10 @@ def fetch_prev_days_vaccine_cumulative():
     cur.execute(sql)
     data = cur.fetchone()
     conn.close()
-    value = data[2]
-    return value
+    daily = data[2]
+    one_dose = data[4]
+    two_doses = data[6]
+    return daily, one_dose, two_doses
 
 
 ### Take out eventually, make module

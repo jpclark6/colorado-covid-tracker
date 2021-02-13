@@ -29,24 +29,7 @@ def handler(event=None, context=None, date=None):
     return "Success"
 
 
-def extract_case_data(date):
-    date = date or today_formatted()  # yyyymmdd
-
-    raw_data = get_raw_case_data(date)
-    save_raw_case_data(date, raw_data)
-
-
-def get_raw_case_data(date):
-    url = f"https://api.covidtracking.com/v1/states/co/{date}.json"
-    response = requests.get(url)
-    return response.json()
-
-
-def save_raw_case_data(date, data):
-    s3_filename = f"raw_cases_data/{date}.json"
-    save_data(s3_filename, data, BUCKET)
-
-
+#### Vaccines ####
 def extract_vaccine_data(date):
     date = date or yesterday_formatted()  # yyyymmdd
 
@@ -65,6 +48,25 @@ def save_raw_vaccine_data(date, data):
     s3_client.upload_fileobj(raw_data, BUCKET, s3_filename)
 
 
+#### CO Website Data - Cases ####
+def extract_case_data(date):
+    date = date or today_formatted()  # yyyymmdd
+
+    raw_data = get_raw_case_data()
+    save_raw_case_data(date, raw_data)
+
+
+def get_raw_case_data():
+    res = requests.get("https://opendata.arcgis.com/datasets/566216cf203e400f8cbf2e6b4354bc57_0.geojson")
+    return res.content
+
+
+def save_raw_case_data(date, data):
+    raw_data = io.BytesIO(data)
+    s3_filename = f"raw_cases_data/{date}.json"
+    s3_client.upload_fileobj(raw_data, BUCKET, s3_filename)
+
+
 ### Take out eventually, make module
 def today_formatted():
     today = datetime.today() - timedelta(hours=7)
@@ -79,8 +81,6 @@ def yesterday_formatted():
 def save_data(s3_filename, data, bucket):
     s3_data = io.BytesIO(json.dumps(data).encode("utf-8"))
     s3_client.upload_fileobj(s3_data, bucket, s3_filename)
-
-
 ###
 
 
