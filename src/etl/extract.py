@@ -57,7 +57,9 @@ def extract_case_data(date):
 
 
 def get_raw_case_data():
-    res = requests.get("https://opendata.arcgis.com/datasets/566216cf203e400f8cbf2e6b4354bc57_0.geojson")
+    res = requests.get(
+        "https://opendata.arcgis.com/datasets/566216cf203e400f8cbf2e6b4354bc57_0.geojson"
+    )
     return res.content
 
 
@@ -81,6 +83,8 @@ def yesterday_formatted():
 def save_data(s3_filename, data, bucket):
     s3_data = io.BytesIO(json.dumps(data).encode("utf-8"))
     s3_client.upload_fileobj(s3_data, bucket, s3_filename)
+
+
 ###
 
 

@@ -35,7 +35,7 @@ def handler(event=None, context=None, date=None):
 def load_case_data(date):
     date = date or today_formatted()  # yyyymmdd
 
-    s3_filename = f"cleaned_cases_data_co/{date}.json"
+    s3_filename = f"cleaned_cases_data/{date}.json"
     clean_data = get_data(s3_filename, BUCKET)
     save_case_data_to_db(date, clean_data)
 
@@ -93,7 +93,11 @@ def save_vaccine_data_to_db(date, clean_data):
             clean_data["people_immunized_one_dose"]
             + clean_data["people_immunized_two_doses"]
         )
-        yesterday_cases, one_dose_daily, two_doses_daily = fetch_prev_days_vaccine_cumulative()
+        (
+            yesterday_cases,
+            one_dose_daily,
+            two_doses_daily,
+        ) = fetch_prev_days_vaccine_cumulative()
         daily = total_cumulative - yesterday_cases
         one_dose_increase = clean_data["people_immunized_one_dose"] - one_dose_daily
         two_doses_increase = clean_data["people_immunized_two_doses"] - two_doses_daily

@@ -1,20 +1,26 @@
 import os
+import decimal
 
 from flask_lambda import FlaskLambda
 from flask import jsonify
 import psycopg2
 import boto3
-import decimal
+from flask_cors import CORS, cross_origin
 
 
 app = FlaskLambda(__name__)
+cors = CORS(app)
+app.config["CORS_HEADERS"] = "Content-Type"
+
 client = boto3.client("ssm")
 
-# DB_CREDENTIALS = os.getenv("DB_CREDENTIALS", None)
-DB_CREDENTIALS = client.get_parameter(Name="/colorado-covid/db_creds")["Parameter"]["Value"]
+DB_CREDENTIALS = client.get_parameter(Name="/colorado-covid/db_creds")["Parameter"][
+    "Value"
+]
 
 
 @app.route("/cases_history/")
+@cross_origin()
 def daily_cases():
     table = "cases"
     values = [
@@ -25,6 +31,8 @@ def daily_cases():
         "positive_increase",
         "death_increase",
         "hospitalized_increase",
+        "tested",
+        "tested_increase",
     ]
     formatted_data = get_formatted_daily_data(table, values)
 
@@ -32,6 +40,7 @@ def daily_cases():
 
 
 @app.route("/cases_average/")
+@cross_origin()
 def daily_averaged_cases():
     """
     Weekly rolling average
@@ -43,6 +52,7 @@ def daily_averaged_cases():
         "positive_increase",
         "death_increase",
         "hospitalized_increase",
+        "tested_increase",
     ]
     formatted_data = get_formatted_averaged_data(table, values)
 
@@ -50,21 +60,31 @@ def daily_averaged_cases():
 
 
 @app.route("/vaccines_history/")
+@cross_origin()
 def daily_vaccines():
     table = "vaccines"
-    values = ["reporting_date", "daily_qty", "daily_cumulative"]
+    values = [
+        "reporting_date",
+        "daily_qty",
+        "daily_cumulative",
+        "one_dose_increase",
+        "one_dose_total",
+        "two_doses_increase",
+        "two_doses_total",
+    ]
     formatted_data = get_formatted_daily_data(table, values)
 
     return jsonify(formatted_data)
 
 
 @app.route("/vaccines_average/")
+@cross_origin()
 def daily_averaged_vaccines():
     """
     Weekly rolling average
     """
     table = "vaccines"
-    values = ["reporting_date", "daily_qty"]
+    values = ["reporting_date", "daily_qty", "one_dose_increase", "two_doses_increase"]
     formatted_data = get_formatted_averaged_data(table, values)
 
     return jsonify(formatted_data)
@@ -72,7 +92,7 @@ def daily_averaged_vaccines():
 
 def get_formatted_daily_data(table, values):
     try:
-        sql = f'SELECT {", ".join(values)} FROM {table} ORDER BY reporting_date DESC;'
+        sql = f'SELECT {", ".join(values)} FROM {table} ORDER BY reporting_date ASC;'
         data = fetch_data(sql)
         formatted_data = format_data(data, values)
     except Exception as e:
@@ -121,16 +141,3 @@ def format_data(data, values):
                 )  # psycopg2 returns Decimal, which fails at json.dumps
         formatted_data.append(new_data)
     return formatted_data
-
-
-# 7 Day moving average
-# SELECT reporting_date,
-#        AVG(positive_increase)
-#             OVER(ORDER BY reporting_date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS avg_positive_increase
-# FROM cases;
-
-# 7 Day moving average
-# SELECT reporting_date,
-#        AVG(daily_qty)
-#             OVER(ORDER BY reporting_date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS avg_daily_vaccines
-# FROM vaccines;

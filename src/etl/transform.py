@@ -111,7 +111,7 @@ def clean_cases_data(raw_data):
             "hospitalizations": properties["Hosp"],
         }
         days.append(data)
-    days = sorted(days, key = lambda i: i['reportingDate'])
+    days = sorted(days, key=lambda i: i["reportingDate"])
     total_days = len(days)
     for i in range(total_days):
         if i == 0:
@@ -121,8 +121,12 @@ def clean_cases_data(raw_data):
             days[i]["testedIncrease"] = days[i]["tested"]
         else:
             days[i]["positiveIncrease"] = days[i]["positive"] - days[i - 1]["positive"]
-            days[i]["deathIncrease"] = days[i]["deathConfirmed"] - days[i - 1]["deathConfirmed"]
-            days[i]["hospitalizedIncrease"] = days[i]["hospitalizations"] - days[i - 1]["hospitalizations"]
+            days[i]["deathIncrease"] = (
+                days[i]["deathConfirmed"] - days[i - 1]["deathConfirmed"]
+            )
+            days[i]["hospitalizedIncrease"] = (
+                days[i]["hospitalizations"] - days[i - 1]["hospitalizations"]
+            )
             days[i]["testedIncrease"] = days[i]["tested"] - days[i - 1]["tested"]
     return days
 
@@ -147,7 +151,7 @@ def get_data(s3_filename, bucket):
 
 
 def get_html_data(s3_filename, bucket):
-    bucket = 'test-covid-jpclark'
+    bucket = "test-covid-jpclark"
     response = s3.get_object(
         Bucket=bucket,
         Key=s3_filename,
@@ -163,6 +167,8 @@ def save_data(s3_filename, data, bucket):
 def reporting_date_to_formatted(date):
     date_time = datetime.strptime(date, "%m/%d/%Y")
     return date_time.strftime("%Y%m%d")
+
+
 ###
 
 
