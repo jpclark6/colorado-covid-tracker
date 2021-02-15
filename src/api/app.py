@@ -106,9 +106,9 @@ def get_formatted_averaged_data(table, values):
         ave_sql = []
         for value in values[1:]:  # don't average reporting_date
             ave_sql.append(
-                f"AVG({value}) OVER(ORDER BY reporting_date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS avg_{value}"
+                f"ROUND(AVG({value}) OVER(ORDER BY reporting_date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW)) AS avg_{value}"
             )
-        sql = f'SELECT reporting_date, {", ".join(ave_sql)} FROM {table} ORDER BY reporting_date DESC;'
+        sql = f'SELECT reporting_date, {", ".join(ave_sql)} FROM {table} ORDER BY reporting_date ASC;'
         data = fetch_data(sql)
         formatted_data = format_data(data, values)
     except Exception as e:
@@ -140,4 +140,80 @@ def format_data(data, values):
                     float(entry[i]), 2
                 )  # psycopg2 returns Decimal, which fails at json.dumps
         formatted_data.append(new_data)
+    return formatted_data
+
+
+@app.route("/data/")
+@cross_origin()
+def get_all_data():
+    daily_cases = get_daily_cases()
+    daily_vaccines = get_daily_vaccines()
+    ave_cases = get_ave_cases()
+    ave_vaccines = get_ave_vaccines()
+    return {
+        "data": {
+            "daily_cases": daily_cases,
+            "daily_vaccines": daily_vaccines,
+            "ave_cases": ave_cases,
+            "ave_vaccines": ave_vaccines,
+        }
+    }
+
+
+def get_daily_cases():
+    table = "cases"
+    values = [
+        "reporting_date",
+        "positive",
+        "hospitalized_currently",
+        "death_confirmed",
+        "positive_increase",
+        "death_increase",
+        "hospitalized_increase",
+        "tested",
+        "tested_increase",
+    ]
+    formatted_data = get_formatted_daily_data(table, values)
+    return formatted_data
+
+
+def get_ave_cases():
+    """
+    Weekly rolling average
+    """
+    table = "cases"
+    values = [
+        "reporting_date",
+        "hospitalized_currently",
+        "positive_increase",
+        "death_increase",
+        "hospitalized_increase",
+        "tested_increase",
+    ]
+    formatted_data = get_formatted_averaged_data(table, values)
+    return formatted_data
+
+
+def get_daily_vaccines():
+    table = "vaccines"
+    values = [
+        "reporting_date",
+        "daily_qty",
+        "daily_cumulative",
+        "one_dose_increase",
+        "one_dose_total",
+        "two_doses_increase",
+        "two_doses_total",
+    ]
+    formatted_data = get_formatted_daily_data(table, values)
+    return formatted_data
+
+
+def get_ave_vaccines():
+    """
+    Weekly rolling average
+    """
+    table = "vaccines"
+    values = ["reporting_date", "daily_qty", "one_dose_increase", "two_doses_increase"]
+    formatted_data = get_formatted_averaged_data(table, values)
     return formatted_data

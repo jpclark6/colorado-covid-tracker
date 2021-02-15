@@ -52,6 +52,24 @@ Resources:
           Properties:
             Path: /vaccines_average/
             Method: get
+        AllData:
+          Type: Api
+          Properties:
+            Path: /data/
+            Method: get
+          Auth:
+            UsagePlan:
+              CreateUsagePlan: PER_API
+              Description: Usage plan for this API
+              Quota:
+                Limit: 500
+                Period: MONTH
+              Throttle:
+                BurstLimit: 100
+                RateLimit: 50
+              Tags:
+                - Key: TagName
+                  Value: TagValue
   
   RawDailyFunction:
     Type: AWS::Serverless::Function

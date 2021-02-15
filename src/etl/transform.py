@@ -151,7 +151,6 @@ def get_data(s3_filename, bucket):
 
 
 def get_html_data(s3_filename, bucket):
-    bucket = "test-covid-jpclark"
     response = s3.get_object(
         Bucket=bucket,
         Key=s3_filename,
