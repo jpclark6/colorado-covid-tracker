@@ -1,5 +1,6 @@
 import os
 import decimal
+from datetime import datetime
 
 from flask_lambda import FlaskLambda
 from flask import jsonify
@@ -18,76 +19,46 @@ DB_CREDENTIALS = client.get_parameter(Name="/colorado-covid/db_creds")["Paramete
     "Value"
 ]
 
+todays_data = {}
 
-@app.route("/cases_history/")
+
+@app.route("/data/")
 @cross_origin()
-def daily_cases():
-    table = "cases"
-    values = [
-        "reporting_date",
-        "positive",
-        "hospitalized_currently",
-        "death_confirmed",
-        "positive_increase",
-        "death_increase",
-        "hospitalized_increase",
-        "tested",
-        "tested_increase",
-    ]
-    formatted_data = get_formatted_daily_data(table, values)
-
-    return jsonify(formatted_data)
-
-
-@app.route("/cases_average/")
-@cross_origin()
-def daily_averaged_cases():
-    """
-    Weekly rolling average
-    """
-    table = "cases"
-    values = [
-        "reporting_date",
-        "hospitalized_currently",
-        "positive_increase",
-        "death_increase",
-        "hospitalized_increase",
-        "tested_increase",
-    ]
-    formatted_data = get_formatted_averaged_data(table, values)
-
-    return jsonify(formatted_data)
+def get_all_data():
+    if todays_data and data_still_valid(todays_data["last_updated"]):
+        return todays_data
+    else:
+        daily_cases = get_daily_cases()
+        daily_vaccines = get_daily_vaccines()
+        ave_cases = get_ave_cases()
+        ave_vaccines = get_ave_vaccines()
+        todays_data = {
+            "data": {
+                "daily_cases": daily_cases,
+                "daily_vaccines": daily_vaccines,
+                "ave_cases": ave_cases,
+                "ave_vaccines": ave_vaccines,
+            },
+            "last_updated": str(datetime.utcnow()),
+        }
+        return {
+            "data": {
+                "daily_cases": daily_cases,
+                "daily_vaccines": daily_vaccines,
+                "ave_cases": ave_cases,
+                "ave_vaccines": ave_vaccines,
+            }
+        }
 
 
-@app.route("/vaccines_history/")
-@cross_origin()
-def daily_vaccines():
-    table = "vaccines"
-    values = [
-        "reporting_date",
-        "daily_qty",
-        "daily_cumulative",
-        "one_dose_increase",
-        "one_dose_total",
-        "two_doses_increase",
-        "two_doses_total",
-    ]
-    formatted_data = get_formatted_daily_data(table, values)
-
-    return jsonify(formatted_data)
-
-
-@app.route("/vaccines_average/")
-@cross_origin()
-def daily_averaged_vaccines():
-    """
-    Weekly rolling average
-    """
-    table = "vaccines"
-    values = ["reporting_date", "daily_qty", "one_dose_increase", "two_doses_increase"]
-    formatted_data = get_formatted_averaged_data(table, values)
-
-    return jsonify(formatted_data)
+def data_still_valid(date):
+    current_time = datetime.utcnow()
+    last_updated = datetime.strptime(date, '%Y-%m-%d %H:%M:%S.%f')
+    if current_time.day == last_updated.day and last_updated.hour >= 1:
+        return True
+    elif current_time.day - 1 == last_updated.day and current_time.hour < 1:
+        return True
+    return False
 
 
 def get_formatted_daily_data(table, values):
@@ -141,23 +112,6 @@ def format_data(data, values):
                 )  # psycopg2 returns Decimal, which fails at json.dumps
         formatted_data.append(new_data)
     return formatted_data
-
-
-@app.route("/data/")
-@cross_origin()
-def get_all_data():
-    daily_cases = get_daily_cases()
-    daily_vaccines = get_daily_vaccines()
-    ave_cases = get_ave_cases()
-    ave_vaccines = get_ave_vaccines()
-    return {
-        "data": {
-            "daily_cases": daily_cases,
-            "daily_vaccines": daily_vaccines,
-            "ave_cases": ave_cases,
-            "ave_vaccines": ave_vaccines,
-        }
-    }
 
 
 def get_daily_cases():

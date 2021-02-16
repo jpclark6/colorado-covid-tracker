@@ -32,26 +32,6 @@ Resources:
         Variables:
           DB_CREDENTIALS: !Ref DbCredentials
       Events:
-        Cases:
-          Type: Api
-          Properties:
-            Path: /cases_history/
-            Method: get
-        AveCases:
-          Type: Api
-          Properties:
-            Path: /cases_average/
-            Method: get
-        Vaccines:
-          Type: Api
-          Properties:
-            Path: /vaccines_history/
-            Method: get
-        AveVaccines:
-          Type: Api
-          Properties:
-            Path: /vaccines_average/
-            Method: get
         AllData:
           Type: Api
           Properties:
@@ -148,20 +128,12 @@ Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
     DeletionPolicy: Retain
+    
 
 Outputs:
-  CoCovidApiHistory:
+  CoCovidApiData:
     Description: "API Gateway endpoint URL for Prod stage for Colorado Covid function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/cases_history/"
-  CoCovidApiDaily:
-    Description: "API Gateway endpoint URL for Prod stage for Colorado Covid function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/cases_daily/"
-  CoCovidApiVaccineHistory:
-    Description: "API Gateway endpoint URL for Prod stage for Colorado Covid function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/vaccines_history/"
-  CoCovidApiVaccineHistory:
-    Description: "API Gateway endpoint URL for Prod stage for Colorado Covid function" 
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/vaccines_daily/"
+    Value: !Sub "https://${CoCovidFunction}.execute-api.${AWS::Region}.amazonaws.com/Prod/data/"
   CoCovidBucket:
     Description: "Bucket used to store stack"
     Value: !Ref S3Bucket
