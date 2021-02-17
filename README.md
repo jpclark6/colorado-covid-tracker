@@ -3,6 +3,14 @@
 
 Vaccine data files currently at https://drive.google.com/drive/folders/1r095ofG8YvNj_dMWEq4XKkfhDaF8-I0n
 
+# Todo
+
+1. Write tests
+1. Clean up some functions, maybe combine if it makes sense
+1. Make sure error notifications are working
+1. Add better logging
+1. Add end date for logs
+
 
 This project contains source code and supporting files for a serverless application that you can deploy with the SAM CLI. It includes the following files and folders.
 

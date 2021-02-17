@@ -26,7 +26,8 @@ Resources:
       Handler: app.app
       Runtime: python3.8
       Policies:
-        - AmazonS3FullAccess
+        - S3FullAccessPolicy:
+            BucketName: !Ref S3Bucket
         - AmazonSSMReadOnlyAccess
       Environment:
         Variables:
@@ -41,15 +42,9 @@ Resources:
             UsagePlan:
               CreateUsagePlan: PER_API
               Description: Usage plan for this API
-              Quota:
-                Limit: 500
-                Period: MONTH
               Throttle:
                 BurstLimit: 100
-                RateLimit: 50
-              Tags:
-                - Key: TagName
-                  Value: TagValue
+                RateLimit: 100
   
   RawDailyFunction:
     Type: AWS::Serverless::Function
@@ -58,8 +53,10 @@ Resources:
       Handler: extract.handler
       Runtime: python3.8
       Policies:
-        - AmazonS3FullAccess
-        - AWSLambdaFullAccess
+        - S3FullAccessPolicy:
+            BucketName: !Ref S3Bucket
+        - LambdaInvokePolicy:
+            FunctionName: !Ref TransformDailyFunction
       Environment:
         Variables:
           NEXT_FUNCTION: !Ref TransformDailyFunction
@@ -76,9 +73,11 @@ Resources:
       Handler: transform.handler
       Runtime: python3.8
       Policies:
-        - AmazonS3FullAccess
+        - S3FullAccessPolicy:
+            BucketName: !Ref S3Bucket
         - AmazonSSMReadOnlyAccess
-        - AWSLambdaFullAccess
+        - LambdaInvokePolicy:
+            FunctionName: !Ref LoadDailyFunction
       Environment:
         Variables:
           NEXT_FUNCTION: !Ref LoadDailyFunction
@@ -90,7 +89,8 @@ Resources:
       Handler: load.handler
       Runtime: python3.8
       Policies:
-      - AmazonS3FullAccess
+      - S3FullAccessPolicy:
+          BucketName: !Ref S3Bucket
       - AmazonSSMReadOnlyAccess
       Environment:
         Variables:
@@ -121,9 +121,9 @@ Resources:
       EvaluationPeriods: 1
       MetricName: Errors
       Namespace: AWS/Lambda
-      Period: 60
+      Period: 120
       Statistic: Sum
-      Threshold: '1'
+      Threshold: 1
 
   S3Bucket:
     Type: AWS::S3::Bucket

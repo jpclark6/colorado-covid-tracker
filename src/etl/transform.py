@@ -131,7 +131,7 @@ def clean_cases_data(raw_data):
     return days
 
 
-### Take out eventually, make module
+### Take out eventually, make lambda layer
 def today_formatted():
     today = datetime.today() - timedelta(hours=7)
     return today.strftime("%Y%m%d")  # yyyymmdd

@@ -154,7 +154,7 @@ def fetch_prev_days_vaccine_cumulative():
     return daily, one_dose, two_doses
 
 
-### Take out eventually, make module
+### Take out eventually, make lambda layer
 def today_formatted():
     today = datetime.today() - timedelta(hours=7)
     return today.strftime("%Y%m%d")  # yyyymmdd
