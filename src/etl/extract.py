@@ -69,7 +69,7 @@ def save_raw_case_data(date, data):
     s3_client.upload_fileobj(raw_data, BUCKET, s3_filename)
 
 
-### Take out eventually, make module
+### Take out eventually, make lambda layer
 def today_formatted():
     today = datetime.today() - timedelta(hours=7)
     return today.strftime("%Y%m%d")  # yyyymmdd
@@ -83,8 +83,6 @@ def yesterday_formatted():
 def save_data(s3_filename, data, bucket):
     s3_data = io.BytesIO(json.dumps(data).encode("utf-8"))
     s3_client.upload_fileobj(s3_data, bucket, s3_filename)
-
-
 ###
 
 

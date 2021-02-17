@@ -26,32 +26,13 @@ Resources:
       Handler: app.app
       Runtime: python3.8
       Policies:
-        - AmazonS3FullAccess
+        - S3FullAccessPolicy:
+            BucketName: !Ref S3Bucket
         - AmazonSSMReadOnlyAccess
       Environment:
         Variables:
           DB_CREDENTIALS: !Ref DbCredentials
       Events:
-        Cases:
-          Type: Api
-          Properties:
-            Path: /cases_history/
-            Method: get
-        AveCases:
-          Type: Api
-          Properties:
-            Path: /cases_average/
-            Method: get
-        Vaccines:
-          Type: Api
-          Properties:
-            Path: /vaccines_history/
-            Method: get
-        AveVaccines:
-          Type: Api
-          Properties:
-            Path: /vaccines_average/
-            Method: get
         AllData:
           Type: Api
           Properties:
@@ -61,15 +42,34 @@ Resources:
             UsagePlan:
               CreateUsagePlan: PER_API
               Description: Usage plan for this API
-              Quota:
-                Limit: 500
-                Period: MONTH
               Throttle:
                 BurstLimit: 100
-                RateLimit: 50
-              Tags:
-                - Key: TagName
-                  Value: TagValue
+                RateLimit: 100
+        HealthCheck:
+          Type: Api
+          Properties:
+            Path: /health/
+            Method: get
+          Auth:
+            UsagePlan:
+              CreateUsagePlan: PER_API
+              Description: Usage plan for this API
+              Throttle:
+                BurstLimit: 1
+                RateLimit: 1
+        ErrorCheck:
+          Type: Api
+          Properties:
+            Path: /throwerror/
+            Method: get
+          Auth:
+            UsagePlan:
+              CreateUsagePlan: PER_API
+              Description: Usage plan for this API
+              Throttle:
+                BurstLimit: 1
+                RateLimit: 1
+
   
   RawDailyFunction:
     Type: AWS::Serverless::Function
@@ -78,8 +78,10 @@ Resources:
       Handler: extract.handler
       Runtime: python3.8
       Policies:
-        - AmazonS3FullAccess
-        - AWSLambdaFullAccess
+        - S3FullAccessPolicy:
+            BucketName: !Ref S3Bucket
+        - LambdaInvokePolicy:
+            FunctionName: !Ref TransformDailyFunction
       Environment:
         Variables:
           NEXT_FUNCTION: !Ref TransformDailyFunction
@@ -96,9 +98,11 @@ Resources:
       Handler: transform.handler
       Runtime: python3.8
       Policies:
-        - AmazonS3FullAccess
+        - S3FullAccessPolicy:
+            BucketName: !Ref S3Bucket
         - AmazonSSMReadOnlyAccess
-        - AWSLambdaFullAccess
+        - LambdaInvokePolicy:
+            FunctionName: !Ref LoadDailyFunction
       Environment:
         Variables:
           NEXT_FUNCTION: !Ref LoadDailyFunction
@@ -110,7 +114,8 @@ Resources:
       Handler: load.handler
       Runtime: python3.8
       Policies:
-      - AmazonS3FullAccess
+      - S3FullAccessPolicy:
+          BucketName: !Ref S3Bucket
       - AmazonSSMReadOnlyAccess
       Environment:
         Variables:
@@ -141,27 +146,19 @@ Resources:
       EvaluationPeriods: 1
       MetricName: Errors
       Namespace: AWS/Lambda
-      Period: 60
+      Period: 120
       Statistic: Sum
-      Threshold: '1'
+      Threshold: 1
 
   S3Bucket:
     Type: AWS::S3::Bucket
     DeletionPolicy: Retain
+    
 
 Outputs:
-  CoCovidApiHistory:
+  CoCovidApiData:
     Description: "API Gateway endpoint URL for Prod stage for Colorado Covid function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/cases_history/"
-  CoCovidApiDaily:
-    Description: "API Gateway endpoint URL for Prod stage for Colorado Covid function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/cases_daily/"
-  CoCovidApiVaccineHistory:
-    Description: "API Gateway endpoint URL for Prod stage for Colorado Covid function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/vaccines_history/"
-  CoCovidApiVaccineHistory:
-    Description: "API Gateway endpoint URL for Prod stage for Colorado Covid function" 
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/vaccines_daily/"
+    Value: !Sub "https://${CoCovidFunction}.execute-api.${AWS::Region}.amazonaws.com/Prod/data/"
   CoCovidBucket:
     Description: "Bucket used to store stack"
     Value: !Ref S3Bucket
