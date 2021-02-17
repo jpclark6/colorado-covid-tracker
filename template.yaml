@@ -45,6 +45,31 @@ Resources:
               Throttle:
                 BurstLimit: 100
                 RateLimit: 100
+        HealthCheck:
+          Type: Api
+          Properties:
+            Path: /health/
+            Method: get
+          Auth:
+            UsagePlan:
+              CreateUsagePlan: PER_API
+              Description: Usage plan for this API
+              Throttle:
+                BurstLimit: 1
+                RateLimit: 1
+        ErrorCheck:
+          Type: Api
+          Properties:
+            Path: /throwerror/
+            Method: get
+          Auth:
+            UsagePlan:
+              CreateUsagePlan: PER_API
+              Description: Usage plan for this API
+              Throttle:
+                BurstLimit: 1
+                RateLimit: 1
+
   
   RawDailyFunction:
     Type: AWS::Serverless::Function

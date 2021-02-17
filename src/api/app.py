@@ -44,6 +44,19 @@ def get_all_data():
             "last_updated": str(datetime.utcnow()),
         }
         return todays_data
+# update
+
+@app.route("/health/")
+@cross_origin()
+def get_health():
+    return jsonify({"status": "ok"})
+
+
+@app.route("/throwerror/")
+@cross_origin()
+def get_error():
+    raise Exception("Testing")
+    return jsonify({"status": "ok"})
 
 
 def data_still_valid(date):
@@ -64,7 +77,6 @@ def data_still_valid(date):
 
 
 def get_formatted_daily_data(table, values):
-    import pdb; pdb.set_trace()
     try:
         sql = f'SELECT {", ".join(values)} FROM {table} ORDER BY reporting_date ASC;'
         data = fetch_data(sql)
