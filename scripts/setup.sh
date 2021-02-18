@@ -9,8 +9,11 @@ echo
 
 python scripts/migrations.py $dbcreds
 
-python -m scripts.backfill_cases $bucket $startdate $enddate $dbcreds
+## Cases no longer needed, they will fill in on the first Lambda run
+# python -m scripts.backfill_cases $bucket $startdate $enddate $dbcreds
 
+## Vaccine data comes from a Google Doc object for the history, but from 
+## the website for daily new data so you have to backfill it manually
 python scripts/backfill_vaccines.py scripts/data_files/$vaccinefile $dbcreds
 
 echo 'Successfully ran migrations and backfilled data'
