@@ -4,38 +4,105 @@ info:
   description: API to consume Colorado COVID data
   version: 0.1.0
 servers:
-  - url: <not hosted yet>
+  - url: https://okvn4rtq0k.execute-api.us-east-1.amazonaws.com/Prod
     description: API Gateway
 paths:
-  /cases_history:
+  /data/:
     get:
-      summary: Returns a list of covid case and vaccine numbers by day
+      summary: Returns all COVID data
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema: 
-                type: array
-                items: 
-                  $ref: '#/components/schemas/CovidData'
-        '405':
-          description: Method Not Allowed
-          content: 
-            'application/json': {}
-            'application/xml': {}
+                $ref: '#/components/schemas/CovidData'
+        '403':
+          description: Forbidden
 components:
   schemas:
     CovidData:
       type: object
       properties:
-        date:
+        data:
+          type: object
+          properties:
+            ave_cases:
+              type: array
+              items:
+                type: object
+                properties:
+                  death_increase:
+                    type: integer
+                  hospitalized_currently:
+                    type: integer
+                  hospitalized_increase:
+                    type: integer
+                  positive_increase:
+                    type: integer
+                  reporting_date:
+                    type: string
+                    format: date
+                  tested_increase:
+                    type: integer
+            ave_vaccines:
+              type: array
+              items:
+                type: object
+                properties:
+                  daily_qty:
+                    type: integer
+                  one_dose_increase:
+                    type: integer
+                  reporting_date:
+                    type: string
+                    format: date
+                  two_doses_increase:
+                    type: integer
+            daily_cases:
+              type: array
+              items:
+                type: object
+                properties:
+                  death_confirmed:
+                    type: integer
+                  death_increase:
+                    type: integer
+                  hospitalized_currently:
+                    type: integer
+                  hospitalized_increase:
+                    type: integer
+                  positive:
+                    type: integer
+                  positive_increase:
+                    type: integer
+                  tested:
+                    type: integer
+                  reporting_date:
+                    type: string
+                    format: date
+                  tested_increase:
+                    type: integer
+            daily_vaccines:
+              type: array
+              items:
+                type: object
+                properties:
+                  daily_cumulative:
+                    type: integer
+                  daily_qty:
+                    type: integer
+                  one_dose_increase:
+                    type: integer
+                  one_dose_total:
+                    type: integer
+                  two_doses_increase:
+                    type: integer
+                  two_doses_total:
+                    type: integer
+                  reporting_date:
+                    type: string
+                    format: date
+        last_updated:
           type: string
-        newCases:
-          type: integer
-        cumulativeCases:
-          type: integer
-        newFirstDoseVaccinated:
-          type: integer
-        cumulativeFirstDoseVaccinated:
-          type: integer
+          format: date-time
