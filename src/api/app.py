@@ -1,6 +1,6 @@
 import os
 import decimal
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from flask_lambda import FlaskLambda
 from flask import jsonify
@@ -67,11 +67,7 @@ def data_still_valid(date):
     """
     current_time = datetime.utcnow()
     last_updated = datetime.strptime(date, '%Y-%m-%d %H:%M:%S.%f')
-    if current_time.day == last_updated.day and last_updated.hour >= 1:
-        return True
-    elif current_time.day - 1 == last_updated.day and current_time.hour < 1:
-        return True
-    elif current_time.day == last_updated.day and current_time.hour < 1:
+    if current_time - last_updated < timedelta(minutes=15):
         return True
     return False
 
@@ -141,6 +137,7 @@ def get_daily_cases():
         "hospitalized_increase",
         "tested",
         "tested_increase",
+        "real_hospitalized_currently",
     ]
     formatted_data = get_formatted_daily_data(table, values)
     return formatted_data

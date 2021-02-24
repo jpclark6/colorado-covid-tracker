@@ -36,7 +36,7 @@ def test_data_endpoint(monkeypatch, apigw_event, mocker, local_api, freeze_datet
 
 
 def test_valid_cache(monkeypatch, apigw_event, mocker, local_api, freeze_datetime_after_6pm):
-    mock_passing_date = {"data": "mock", "last_updated": '2021-10-05 02:02:01.142314'}
+    mock_passing_date = {"data": "mock", "last_updated": '2021-10-05 01:02:01.142314'}
     local_api.todays_data = mock_passing_date
 
     ret = local_api.app(apigw_event, "")
