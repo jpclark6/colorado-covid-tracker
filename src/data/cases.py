@@ -1,9 +1,7 @@
-import logging
 import os
 import io
 from datetime import datetime, timedelta
 import json
-import sys
 
 import requests
 import boto3
@@ -21,13 +19,14 @@ s3_client = boto3.client("s3")
 
 def handler(event=None, context=None):
     raw_data = get_raw_case_data()
-    if today_formatted() in str(raw_data):
+    if next_day() in str(raw_data):
         save_to_s3(raw_data, raw_s3_filename())
 
         clean_data = clean_cases_data(raw_data)
         save_to_s3(clean_data, clean_s3_filename())
 
         save_case_data_to_db(clean_data)
+        print("Success")
     else:
         print("Data not updated yet")
 
@@ -36,18 +35,22 @@ def save_case_data_to_db(clean_data):
     conn = psycopg2.connect(DB_CREDENTIALS)
     cur = conn.cursor()
 
+    i = 0
     for day in clean_data:
+        i += 1
         sql_data = (
-            day["reportingDate"],
+            day["reporting_date"],
             day["positive"],
             day["hospitalizations"],
-            day["deathConfirmed"],
-            day["positiveIncrease"],
-            day["deathIncrease"],
-            day["hospitalizedIncrease"],
+            day["death_confirmed"],
+            day["positive_increase"],
+            day["death_increase"],
+            day["hospitalized_increase"],
             day["tested"],
-            day["testedIncrease"],
+            day["tested_increase"],
         )
+
+        sql_vars = sql_data + sql_data + (day["reporting_date"],)
 
         sql = """
             INSERT INTO cases (reporting_date, positive, total_hospitalized, death_confirmed, 
@@ -55,47 +58,59 @@ def save_case_data_to_db(clean_data):
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT (reporting_date) DO UPDATE SET
             reporting_date = %s, positive = %s, total_hospitalized = %s, death_confirmed = %s,
             positive_increase = %s, death_increase = %s, hospitalized_increase = %s, tested = %s,
-            tested_increase = %s;
+            tested_increase = %s WHERE cases.reporting_date = %s;
         """
 
-        cur.execute(sql, sql_data + sql_data)
+        cur.execute(sql, sql_vars)
+        if i % 25 == 0:
+            conn.commit()
     conn.commit()
     conn.close()
 
 
 def clean_cases_data(raw_data):
     daily_data = raw_data["features"]
-    days = []
+    data = extract_relevant_data(daily_data)
+    sorted_data = sorted(data, key=lambda day: day["reporting_date"])
+    cleaned_data = add_metric_increases(sorted_data)
+    return cleaned_data
+
+
+def extract_relevant_data(daily_data):
+    relevant_data = []
     for day in daily_data:
         properties = day["properties"]
         if not properties["Date"]:
             continue
         data = {
-            "reportingDate": reporting_date_to_formatted(properties["Date"]),
+            "reporting_date": reporting_date_to_formatted(properties["Date"]),
             "positive": properties["Cases"],
             "tested": properties["Tested"],
-            "deathConfirmed": properties["Deaths"],
+            "death_confirmed": properties["Deaths"],
             "hospitalizations": properties["Hosp"],
         }
-        days.append(data)
-    days = sorted(days, key=lambda i: i["reportingDate"])
-    total_days = len(days)
+        relevant_data.append(data)
+    return relevant_data
+
+
+def add_metric_increases(sorted_data):
+    total_days = len(sorted_data)
     for i in range(total_days):
         if i == 0:
-            days[i]["positiveIncrease"] = days[i]["positive"]
-            days[i]["deathIncrease"] = days[i]["deathConfirmed"]
-            days[i]["hospitalizedIncrease"] = days[i]["hospitalizations"]
-            days[i]["testedIncrease"] = days[i]["tested"]
+            sorted_data[i]["positive_increase"] = sorted_data[i]["positive"]
+            sorted_data[i]["death_increase"] = sorted_data[i]["death_confirmed"]
+            sorted_data[i]["hospitalized_increase"] = sorted_data[i]["hospitalizations"]
+            sorted_data[i]["tested_increase"] = sorted_data[i]["tested"]
         else:
-            days[i]["positiveIncrease"] = days[i]["positive"] - days[i - 1]["positive"]
-            days[i]["deathIncrease"] = (
-                days[i]["deathConfirmed"] - days[i - 1]["deathConfirmed"]
+            sorted_data[i]["positive_increase"] = sorted_data[i]["positive"] - sorted_data[i - 1]["positive"]
+            sorted_data[i]["death_increase"] = (
+                sorted_data[i]["death_confirmed"] - sorted_data[i - 1]["death_confirmed"]
             )
-            days[i]["hospitalizedIncrease"] = (
-                days[i]["hospitalizations"] - days[i - 1]["hospitalizations"]
+            sorted_data[i]["hospitalized_increase"] = (
+                sorted_data[i]["hospitalizations"] - sorted_data[i - 1]["hospitalizations"]
             )
-            days[i]["testedIncrease"] = days[i]["tested"] - days[i - 1]["tested"]
-    return days
+            sorted_data[i]["tested_increase"] = sorted_data[i]["tested"] - sorted_data[i - 1]["tested"]
+    return sorted_data
 
 
 def reporting_date_to_formatted(date):
@@ -114,9 +129,35 @@ def save_to_s3(json_data, s3_filename):
     s3_client.upload_fileobj(raw_data, BUCKET, s3_filename)
 
 
-def today_formatted():
-    today = datetime.today() - timedelta(hours=7)
-    return today.strftime("%m/%d/%Y")
+def format_day(date):
+    return date.strftime("%m/%d/%Y")
+
+
+def next_day():
+    new_day = fetch_latest_day_data()['reporting_date'] + timedelta(days=1)
+    return format_day(new_day)
+
+
+def week_before():
+    return datetime.utcnow() - timedelta(days=7, hours=7)
+
+
+def fetch_latest_day_data():
+    sql = "SELECT * FROM cases ORDER BY reporting_date DESC LIMIT 1;"
+    conn = psycopg2.connect(DB_CREDENTIALS)
+    cur = conn.cursor()
+    cur.execute(sql)
+    data = cur.fetchone()
+    conn.close()
+
+    if data:
+        return {
+            'reporting_date': data[0],
+        }
+    else:
+        return  {
+            'reporting_date': week_before,
+        }
 
 
 def raw_s3_filename():

@@ -14,6 +14,7 @@ Globals:
       Variables:
         S3_BUCKET: !Ref S3Bucket
         DB_CREDENTIALS: '{{resolve:ssm:/colorado-covid/database:1}}'
+        INVALIDATE_CACHE_KEY: '{{resolve:ssm:/colorado-covid/invalidate_cache_key:1}}'
 
 Resources:
   CoCovidFunction:
@@ -47,6 +48,18 @@ Resources:
           Properties:
             Path: /health/
             Method: get
+          Auth:
+            UsagePlan:
+              CreateUsagePlan: PER_API
+              Description: Usage plan for this API
+              Throttle:
+                BurstLimit: 1
+                RateLimit: 1
+        InvalidateCache:
+          Type: Api
+          Properties:
+            Path: /invalidate_cache/
+            Method: post
           Auth:
             UsagePlan:
               CreateUsagePlan: PER_API

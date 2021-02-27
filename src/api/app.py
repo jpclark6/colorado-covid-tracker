@@ -3,7 +3,7 @@ import decimal
 from datetime import datetime, timedelta
 
 from flask_lambda import FlaskLambda
-from flask import jsonify
+from flask import jsonify, request
 import psycopg2
 import boto3
 from flask_cors import CORS, cross_origin
@@ -15,9 +15,14 @@ app.config["CORS_HEADERS"] = "Content-Type"
 
 client = boto3.client("ssm")
 
-DB_CREDENTIALS = client.get_parameter(Name="/colorado-covid/db_creds")["Parameter"][
-    "Value"
-]
+DB_CREDENTIALS = os.getenv('DB_CREDENTIALS')
+if not DB_CREDENTIALS:
+    print("No DB credentials found")
+INVALIDATE_CACHE_KEY = os.getenv('INVALIDATE_CACHE_KEY')
+
+# INVALIDATE_CACHE_KEY = client.get_parameter(Name="/colorado-covid/invalidate_cache_key")["Parameter"][
+#     "Value"
+# ]
 
 todays_data = {}
 
@@ -44,7 +49,18 @@ def get_all_data():
             "last_updated": str(datetime.utcnow()),
         }
         return todays_data
-# update
+
+
+@app.route("/invalidate_cache/", methods=['POST'])
+def invalidate_cache():
+    key = request.headers.get('invalidate-cache-key')
+    if key == INVALIDATE_CACHE_KEY
+        global todays_data
+        todays_data = None
+        return jsonify({"status": "success"})
+    else:
+        return jsonify({"status": "unauthorized"}), 403
+
 
 @app.route("/health/")
 @cross_origin()
@@ -56,14 +72,14 @@ def get_health():
 @cross_origin()
 def get_error():
     raise Exception("Testing")
-    return jsonify({"status": "ok"})
+    return jsonify({"status": "test error"}), 400
 
 
 def data_still_valid(date):
     """
     Checks if the last updated time is cached, and if it is
-    checks whether it is valid. A time is valid for 24 hours after
-    6pm MST (01:00 UTC)
+    checks whether it is valid. A time is valid for 15 minutes
+    or until it is cleared
     """
     current_time = datetime.utcnow()
     last_updated = datetime.strptime(date, '%Y-%m-%d %H:%M:%S.%f')
@@ -137,11 +153,11 @@ def get_daily_cases():
         "hospitalized_increase",
         "tested",
         "tested_increase",
-        "real_hospitalized_currently",
+        "total_hospitalized",
     ]
     formatted_data = get_formatted_daily_data(table, values)
     return formatted_data
-
+ 
 
 def get_ave_cases():
     """
@@ -170,7 +186,16 @@ def get_daily_vaccines():
         "one_dose_total",
         "two_doses_increase",
         "two_doses_total",
+        "daily_pfizer",
+        "daily_moderna",
+        "pfizer_total",
+        "moderna_total",
+        "distributed_increase",
+        "distrubuted_total",
+        "total_vaccine_providers",
     ]
+
+
     formatted_data = get_formatted_daily_data(table, values)
     return formatted_data
 
@@ -180,6 +205,6 @@ def get_ave_vaccines():
     Weekly rolling average
     """
     table = "vaccines"
-    values = ["reporting_date", "daily_qty", "one_dose_increase", "two_doses_increase"]
+    values = ["reporting_date", "daily_qty", "one_dose_increase", "two_doses_increase", "daily_pfizer", "daily_moderna", "distributed_increase"]
     formatted_data = get_formatted_averaged_data(table, values)
     return formatted_data
