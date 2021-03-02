@@ -27,8 +27,8 @@ if __name__ == "__main__":
     cur = conn.cursor()
     for day in hospitalized:
         print(day)
-        sql = f"UPDATE cases SET real_hospitalized_currently = {day['value']} WHERE reporting_date = '{day['reporting_date']}';"
+        sql = f"UPDATE cases SET hospitalized_currently = {day['value']} WHERE reporting_date = '{day['reporting_date']}';"
         cur.execute(sql)
 
-        conn.commit()
+    conn.commit()
     conn.close()

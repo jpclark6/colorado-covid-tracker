@@ -54,7 +54,7 @@ def get_all_data():
 @app.route("/invalidate_cache/", methods=['POST'])
 def invalidate_cache():
     key = request.headers.get('invalidate-cache-key')
-    if key == INVALIDATE_CACHE_KEY
+    if key == INVALIDATE_CACHE_KEY:
         global todays_data
         todays_data = None
         return jsonify({"status": "success"})

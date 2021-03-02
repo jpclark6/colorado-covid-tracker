@@ -13,6 +13,8 @@ DB_CREDENTIALS = os.getenv("DB_CREDENTIALS")
 API_URL = (
     "https://opendata.arcgis.com/datasets/566216cf203e400f8cbf2e6b4354bc57_0.geojson"
 )
+INVALIDATE_CACHE_KEY = os.getenv('INVALIDATE_CACHE_KEY')
+API_GATEWAY_URL = os.getenv('API_URL')
 
 s3_client = boto3.client("s3")
 
@@ -26,9 +28,29 @@ def handler(event=None, context=None):
         save_to_s3(clean_data, clean_s3_filename())
 
         save_case_data_to_db(clean_data)
+        invalidate_cache()
         print("Success")
+        log_update_time(new_data=True)
     else:
         print("Data not updated yet")
+        log_update_time(new_data=False)
+
+
+def invalidate_cache():
+    headers = {'invalidate-cache-key': INVALIDATE_CACHE_KEY}
+    response = requests.post(API_GATEWAY_URL, headers=headers)
+    if response.status_code == 200:
+        print("Successfully invalidated cache")
+    else:
+        print("Failed to invalidate cache")
+
+
+def log_update_time(new_data=False):
+    conn = psycopg2.connect(DB_CREDENTIALS)
+    cur = conn.cursor()
+    cur.execute("INSERT INTO invokes (function_name, invoke_time, new_data) VALUES (%s, now(), %s)", ("cases", new_data))
+    conn.commit()
+    conn.close()
 
 
 def save_case_data_to_db(clean_data):

@@ -2,10 +2,14 @@ import os
 import io
 from datetime import datetime, timedelta
 import json
+import logging
 
 import requests
 import boto3
 import psycopg2
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
 BUCKET = os.getenv("S3_BUCKET")
@@ -13,22 +17,55 @@ DB_CREDENTIALS = os.getenv("DB_CREDENTIALS")
 API_URL = (
     "https://opendata.arcgis.com/datasets/a681d9e9f61144b2977badb89149198c_0.geojson"
 )
+INVALIDATE_CACHE_KEY = os.getenv('INVALIDATE_CACHE_KEY')
+API_GATEWAY_URL = os.getenv('API_URL')
 
 s3_client = boto3.client("s3")
 
 
 def handler(event=None, context=None):
+    logger.info('Requesting raw data')
     raw_data = get_raw_vaccine_data()
+
     if new_day_formatted() in str(raw_data):
-        save_to_s3(raw_data, raw_s3_filename())
+        s3_filename = raw_s3_filename()
+        logger.info(f"New data found. Saving to S3 s3://{BUCKET}/{s3_filename}")
 
+        save_to_s3(raw_data, s3_filename)
+
+        logger.info("Saved to S3. Cleaning data")
         clean_data = clean_vaccine_data(raw_data)
-        save_to_s3(clean_data, clean_s3_filename())
+        
+        s3_filename = clean_s3_filename()
+        logger.info(f"Saving cleaned data to S3 s3://{BUCKET}/{s3_filename}")
+        save_to_s3(clean_data, s3_filename)
 
+        logger.info("Saving cleaned data to database")
         save_vaccine_data_to_db(clean_data)
-        print("Success")
+        log_update_time(new_data=True)
+
+        logger.info("Success")
+        invalidate_cache()
     else:
-        print("Data not updated yet")
+        logger.info("Data not updated yet")
+        log_update_time(new_data=False)
+
+
+def invalidate_cache():
+    headers = {'invalidate-cache-key': INVALIDATE_CACHE_KEY}
+    response = requests.post(API_GATEWAY_URL, headers=headers)
+    if response.status_code == 200:
+        logger.info("Successfully invalidated cache")
+    else:
+        logger.info("Failed to invalidate cache")
+
+
+def log_update_time(new_data=False):
+    conn = psycopg2.connect(DB_CREDENTIALS)
+    cur = conn.cursor()
+    cur.execute("INSERT INTO invokes (function_name, invoke_time, new_data) VALUES (%s, now(), %s)", ("vaccines", new_data))
+    conn.commit()
+    conn.close()
 
 
 def save_vaccine_data_to_db(clean_data):

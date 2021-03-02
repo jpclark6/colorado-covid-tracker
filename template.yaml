@@ -9,12 +9,13 @@ Parameters:
     Type: String
 Globals:
   Function:
-    Timeout: 6
+    Timeout: 120
     Environment:
       Variables:
         S3_BUCKET: !Ref S3Bucket
         DB_CREDENTIALS: '{{resolve:ssm:/colorado-covid/database:1}}'
         INVALIDATE_CACHE_KEY: '{{resolve:ssm:/colorado-covid/invalidate_cache_key:1}}'
+        API_URL: '{{resolve:ssm:/colorado-covid/api_url:1}}'
 
 Resources:
   CoCovidFunction:
@@ -27,9 +28,6 @@ Resources:
         - S3FullAccessPolicy:
             BucketName: !Ref S3Bucket
         - AmazonSSMReadOnlyAccess
-      Environment:
-        Variables:
-          DB_CREDENTIALS: !Ref DbCredentials
       Events:
         AllData:
           Type: Api
@@ -94,7 +92,7 @@ Resources:
         CaseEvent:
           Type: Schedule
           Properties:
-            Schedule: cron(*/10 0-3,23 * * *)
+            Schedule: cron(*/10 0,1,2,3,23 * * ? *)
 
   VaccineDataFunction:
     Type: AWS::Serverless::Function
@@ -110,7 +108,7 @@ Resources:
         VacEvent:
           Type: Schedule
           Properties:
-            Schedule: cron(*/10 0-3,23 * * *)
+            Schedule: cron(*/10 0,1,2,3,23 * * ? *)
 
   AlarmTopic:
     Type: AWS::SNS::Topic
@@ -128,12 +126,10 @@ Resources:
       Dimensions:
         - Name: APIFunction
           Value: !Ref CoCovidFunction
-        - Name: RawLambdaFunction
-          Value: !Ref RawDailyFunction
-        - Name: TransormLambdaFunction
-          Value: !Ref TransformDailyFunction
-        - Name: LoadLambdaFunction
-          Value: !Ref LoadDailyFunction
+        - Name: CasesFunction
+          Value: !Ref CasesDataFunction
+        - Name: VaccineFunction
+          Value: !Ref VaccineDataFunction
       EvaluationPeriods: 1
       MetricName: Errors
       Namespace: AWS/Lambda
@@ -149,7 +145,7 @@ Resources:
 Outputs:
   CoCovidApiData:
     Description: "API Gateway endpoint URL for Prod stage for Colorado Covid function"
-    Value: !Sub "https://${CoCovidFunction}.execute-api.${AWS::Region}.amazonaws.com/Prod/data/"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/data/"
   CoCovidBucket:
     Description: "Bucket used to store stack"
     Value: !Ref S3Bucket
