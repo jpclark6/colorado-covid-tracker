@@ -25,7 +25,7 @@ INVALIDATE_CACHE_KEY = os.getenv("INVALIDATE_CACHE_KEY")
 if not INVALIDATE_CACHE_KEY:
     logger.error({"error": "no invalidate cache key found"})
 
-todays_data = {} # stores full data set; global var to cache data with Lambda
+todays_data = {}  # stores full data set; global var to cache data with Lambda
 
 
 @app.route("/data/")
@@ -138,7 +138,7 @@ def format_data(data, values):
             if value == "reporting_date":
                 new_data[value] = str(entry[i])
             elif value in time_columns:
-                new_data[value] = str(entry[i] - timedelta(hours=7)) # convert to MST
+                new_data[value] = str(entry[i] - timedelta(hours=7))  # convert to MST
             elif isinstance(entry[i], decimal.Decimal):
                 new_data[value] = round(
                     float(entry[i]), 2
