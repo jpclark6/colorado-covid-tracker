@@ -7,16 +7,14 @@ Description: >
 Parameters: 
   NotificationEmail:
     Type: String
-  DbCredentials:
-    Type: 'AWS::SSM::Parameter::Value<String>'
-    Description: Database creds in the format postgres://<user>:<pw>@<host>/<db>
-    Default: /colorado-covid/db_creds
 Globals:
   Function:
-    Timeout: 6
     Environment:
       Variables:
         S3_BUCKET: !Ref S3Bucket
+        DB_CREDENTIALS: '{{resolve:ssm:/colorado-covid/database:1}}'
+        INVALIDATE_CACHE_KEY: '{{resolve:ssm:/colorado-covid/invalidate_cache_key:1}}'
+        API_URL: '{{resolve:ssm:/colorado-covid/api_url:1}}'
 
 Resources:
   CoCovidFunction:
@@ -25,13 +23,11 @@ Resources:
       CodeUri: src/api/
       Handler: app.app
       Runtime: python3.8
+      Timeout: 15
       Policies:
         - S3FullAccessPolicy:
             BucketName: !Ref S3Bucket
         - AmazonSSMReadOnlyAccess
-      Environment:
-        Variables:
-          DB_CREDENTIALS: !Ref DbCredentials
       Events:
         AllData:
           Type: Api
@@ -57,6 +53,18 @@ Resources:
               Throttle:
                 BurstLimit: 1
                 RateLimit: 1
+        InvalidateCache:
+          Type: Api
+          Properties:
+            Path: /invalidate_cache/
+            Method: post
+          Auth:
+            UsagePlan:
+              CreateUsagePlan: PER_API
+              Description: Usage plan for this API
+              Throttle:
+                BurstLimit: 1
+                RateLimit: 1
         ErrorCheck:
           Type: Api
           Properties:
@@ -69,57 +77,42 @@ Resources:
               Throttle:
                 BurstLimit: 1
                 RateLimit: 1
-
   
-  RawDailyFunction:
+  CasesDataFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/etl/
-      Handler: extract.handler
+      CodeUri: src/data/
+      Handler: cases.handler
       Runtime: python3.8
-      Policies:
-        - S3FullAccessPolicy:
-            BucketName: !Ref S3Bucket
-        - LambdaInvokePolicy:
-            FunctionName: !Ref TransformDailyFunction
-      Environment:
-        Variables:
-          NEXT_FUNCTION: !Ref TransformDailyFunction
-      Events:
-        EEvent:
-          Type: Schedule
-          Properties:
-            Schedule: cron(0 1 * * ? *)
-
-  TransformDailyFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: src/etl/
-      Handler: transform.handler
-      Runtime: python3.8
+      Timeout: 30
+      MemorySize: 150
       Policies:
         - S3FullAccessPolicy:
             BucketName: !Ref S3Bucket
         - AmazonSSMReadOnlyAccess
-        - LambdaInvokePolicy:
-            FunctionName: !Ref LoadDailyFunction
-      Environment:
-        Variables:
-          NEXT_FUNCTION: !Ref LoadDailyFunction
+      Events:
+        CaseEvent:
+          Type: Schedule
+          Properties:
+            Schedule: cron(*/10 0,1,2,3,23 * * ? *)
 
-  LoadDailyFunction:
+  VaccineDataFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/etl/
-      Handler: load.handler
+      CodeUri: src/data/
+      Handler: vaccines.handler
       Runtime: python3.8
+      Timeout: 60
+      MemorySize: 350
       Policies:
-      - S3FullAccessPolicy:
-          BucketName: !Ref S3Bucket
-      - AmazonSSMReadOnlyAccess
-      Environment:
-        Variables:
-          DB_CREDENTIALS: !Ref DbCredentials
+        - S3FullAccessPolicy:
+            BucketName: !Ref S3Bucket
+        - AmazonSSMReadOnlyAccess
+      Events:
+        VacEvent:
+          Type: Schedule
+          Properties:
+            Schedule: cron(*/10 0,1,2,3,23 * * ? *)
 
   AlarmTopic:
     Type: AWS::SNS::Topic
@@ -137,18 +130,16 @@ Resources:
       Dimensions:
         - Name: APIFunction
           Value: !Ref CoCovidFunction
-        - Name: RawLambdaFunction
-          Value: !Ref RawDailyFunction
-        - Name: TransormLambdaFunction
-          Value: !Ref TransformDailyFunction
-        - Name: LoadLambdaFunction
-          Value: !Ref LoadDailyFunction
+        # - Name: CasesFunction
+        #   Value: !Ref CasesDataFunction
+        # - Name: VaccineFunction
+        #   Value: !Ref VaccineDataFunction
       EvaluationPeriods: 1
       MetricName: Errors
       Namespace: AWS/Lambda
       Period: 120
       Statistic: Sum
-      Threshold: 1
+      Threshold: '1'
 
   S3Bucket:
     Type: AWS::S3::Bucket
@@ -158,7 +149,7 @@ Resources:
 Outputs:
   CoCovidApiData:
     Description: "API Gateway endpoint URL for Prod stage for Colorado Covid function"
-    Value: !Sub "https://${CoCovidFunction}.execute-api.${AWS::Region}.amazonaws.com/Prod/data/"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/data/"
   CoCovidBucket:
     Description: "Bucket used to store stack"
     Value: !Ref S3Bucket
