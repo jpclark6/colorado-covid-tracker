@@ -129,16 +129,17 @@ def fetch_data(sql):
 
 
 def format_data(data, values):
+    time_columns = ["created_at", "updated_at"]
     formatted_data = []
     for entry in data:
         new_data = {}
         for i, value in enumerate(values):
             new_data[value] = entry[i]
             if value == "reporting_date":
-                # hacky way to get date format to not
-                # fail when creating json later on
                 new_data[value] = str(entry[i])
-            if isinstance(entry[i], decimal.Decimal):
+            elif value in time_columns:
+                new_data[value] = str(entry[i] - timedelta(hours=7)) # convert to MST
+            elif isinstance(entry[i], decimal.Decimal):
                 new_data[value] = round(
                     float(entry[i]), 2
                 )  # psycopg2 returns Decimal, which fails at json.dumps
