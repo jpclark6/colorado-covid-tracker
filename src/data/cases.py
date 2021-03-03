@@ -2,53 +2,79 @@ import os
 import io
 from datetime import datetime, timedelta
 import json
+import logging
 
 import requests
 import boto3
 import psycopg2
 
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
 
 BUCKET = os.getenv("S3_BUCKET")
+if not BUCKET:
+    logger.error({"error": "no bucket env var found"})
 DB_CREDENTIALS = os.getenv("DB_CREDENTIALS")
+if not DB_CREDENTIALS:
+    logger.error({"error": "no DB credentials env var found"})
 API_URL = (
     "https://opendata.arcgis.com/datasets/566216cf203e400f8cbf2e6b4354bc57_0.geojson"
 )
-INVALIDATE_CACHE_KEY = os.getenv('INVALIDATE_CACHE_KEY')
-API_GATEWAY_URL = os.getenv('API_URL')
+# following two keys aren't required to function, but if not included then the function
+# won't invalidate the cache as soon as new data is available, but it still
+# will every 15 minutes per the normal schedule
+INVALIDATE_CACHE_KEY = os.getenv("INVALIDATE_CACHE_KEY")
+API_GATEWAY_URL = os.getenv("API_URL")
 
 s3_client = boto3.client("s3")
 
 
 def handler(event=None, context=None):
+    logger.info("Requesting raw data")
     raw_data = get_raw_case_data()
+
     if next_day() in str(raw_data):
-        save_to_s3(raw_data, raw_s3_filename())
+        s3_filename = raw_s3_filename()
+        logger.info(f"New data found. Saving to s3://{BUCKET}/{s3_filename}")
+        save_to_s3(raw_data, s3_filename)
 
+        logger.info("Cleaning data")
         clean_data = clean_cases_data(raw_data)
-        save_to_s3(clean_data, clean_s3_filename())
 
+        s3_filename = clean_s3_filename()
+        logger.info(f"Saving cleaned data to s3://{BUCKET}/{s3_filename}")
+        save_to_s3(clean_data, s3_filename)
+
+        logger.info("Saving to database")
         save_case_data_to_db(clean_data)
-        invalidate_cache()
-        print("Success")
         log_update_time(new_data=True)
+
+        logger.info("Success")
+        invalidate_cache()
     else:
-        print("Data not updated yet")
+        logger.info("Data not updated yet")
         log_update_time(new_data=False)
 
 
 def invalidate_cache():
-    headers = {'invalidate-cache-key': INVALIDATE_CACHE_KEY}
-    response = requests.post(API_GATEWAY_URL, headers=headers)
+    logger.info("Invalidating cache")
+    headers = {"invalidate-cache-key": INVALIDATE_CACHE_KEY}
+    response = requests.post(API_GATEWAY_URL + "/invalidate_cache/", headers=headers)
     if response.status_code == 200:
-        print("Successfully invalidated cache")
+        logger.info("Successfully invalidated cache")
     else:
-        print("Failed to invalidate cache")
+        logger.info("Failed to invalidate cache")
 
 
 def log_update_time(new_data=False):
+    """Update DB with times we checked for new data along with status of if we found new data"""
     conn = psycopg2.connect(DB_CREDENTIALS)
     cur = conn.cursor()
-    cur.execute("INSERT INTO invokes (function_name, invoke_time, new_data) VALUES (%s, now(), %s)", ("cases", new_data))
+    cur.execute(
+        "INSERT INTO invokes (function_name, invoke_time, new_data) VALUES (%s, now(), %s)",
+        ("cases", new_data),
+    )
     conn.commit()
     conn.close()
 
@@ -124,14 +150,20 @@ def add_metric_increases(sorted_data):
             sorted_data[i]["hospitalized_increase"] = sorted_data[i]["hospitalizations"]
             sorted_data[i]["tested_increase"] = sorted_data[i]["tested"]
         else:
-            sorted_data[i]["positive_increase"] = sorted_data[i]["positive"] - sorted_data[i - 1]["positive"]
+            sorted_data[i]["positive_increase"] = (
+                sorted_data[i]["positive"] - sorted_data[i - 1]["positive"]
+            )
             sorted_data[i]["death_increase"] = (
-                sorted_data[i]["death_confirmed"] - sorted_data[i - 1]["death_confirmed"]
+                sorted_data[i]["death_confirmed"]
+                - sorted_data[i - 1]["death_confirmed"]
             )
             sorted_data[i]["hospitalized_increase"] = (
-                sorted_data[i]["hospitalizations"] - sorted_data[i - 1]["hospitalizations"]
+                sorted_data[i]["hospitalizations"]
+                - sorted_data[i - 1]["hospitalizations"]
             )
-            sorted_data[i]["tested_increase"] = sorted_data[i]["tested"] - sorted_data[i - 1]["tested"]
+            sorted_data[i]["tested_increase"] = (
+                sorted_data[i]["tested"] - sorted_data[i - 1]["tested"]
+            )
     return sorted_data
 
 
@@ -146,7 +178,7 @@ def get_raw_case_data():
 
 
 def save_to_s3(json_data, s3_filename):
-    data = json.dumps(json_data).encode('utf-8')
+    data = json.dumps(json_data).encode("utf-8")
     raw_data = io.BytesIO(data)
     s3_client.upload_fileobj(raw_data, BUCKET, s3_filename)
 
@@ -156,7 +188,7 @@ def format_day(date):
 
 
 def next_day():
-    new_day = fetch_latest_day_data()['reporting_date'] + timedelta(days=1)
+    new_day = fetch_latest_day_data()["reporting_date"] + timedelta(days=1)
     return format_day(new_day)
 
 
@@ -174,11 +206,11 @@ def fetch_latest_day_data():
 
     if data:
         return {
-            'reporting_date': data[0],
+            "reporting_date": data[0],
         }
     else:
-        return  {
-            'reporting_date': week_before,
+        return {
+            "reporting_date": week_before,
         }
 
 

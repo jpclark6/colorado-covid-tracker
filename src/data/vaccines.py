@@ -13,31 +13,37 @@ logger.setLevel(logging.INFO)
 
 
 BUCKET = os.getenv("S3_BUCKET")
+if not BUCKET:
+    logger.error({"error": "no bucket env var found"})
 DB_CREDENTIALS = os.getenv("DB_CREDENTIALS")
+if not DB_CREDENTIALS:
+    logger.error({"error": "no DB credentials env var found"})
 API_URL = (
     "https://opendata.arcgis.com/datasets/a681d9e9f61144b2977badb89149198c_0.geojson"
 )
-INVALIDATE_CACHE_KEY = os.getenv('INVALIDATE_CACHE_KEY')
-API_GATEWAY_URL = os.getenv('API_URL')
+# following two keys aren't required to function, but if not included then the function
+# won't invalidate the cache as soon as new data is available, but it still
+# will every 15 minutes per the normal schedule
+INVALIDATE_CACHE_KEY = os.getenv("INVALIDATE_CACHE_KEY")
+API_GATEWAY_URL = os.getenv("API_URL")
 
 s3_client = boto3.client("s3")
 
 
 def handler(event=None, context=None):
-    logger.info('Requesting raw data')
+    logger.info("Requesting raw data")
     raw_data = get_raw_vaccine_data()
 
     if new_day_formatted() in str(raw_data):
         s3_filename = raw_s3_filename()
-        logger.info(f"New data found. Saving to S3 s3://{BUCKET}/{s3_filename}")
-
+        logger.info(f"New data found. Saving to s3://{BUCKET}/{s3_filename}")
         save_to_s3(raw_data, s3_filename)
 
         logger.info("Saved to S3. Cleaning data")
         clean_data = clean_vaccine_data(raw_data)
-        
+
         s3_filename = clean_s3_filename()
-        logger.info(f"Saving cleaned data to S3 s3://{BUCKET}/{s3_filename}")
+        logger.info(f"Saving cleaned data to s3://{BUCKET}/{s3_filename}")
         save_to_s3(clean_data, s3_filename)
 
         logger.info("Saving cleaned data to database")
@@ -52,8 +58,9 @@ def handler(event=None, context=None):
 
 
 def invalidate_cache():
-    headers = {'invalidate-cache-key': INVALIDATE_CACHE_KEY}
-    response = requests.post(API_GATEWAY_URL, headers=headers)
+    headers = {"invalidate-cache-key": INVALIDATE_CACHE_KEY}
+
+    response = requests.post(API_GATEWAY_URL + "/invalidate_cache/", headers=headers)
     if response.status_code == 200:
         logger.info("Successfully invalidated cache")
     else:
@@ -63,7 +70,10 @@ def invalidate_cache():
 def log_update_time(new_data=False):
     conn = psycopg2.connect(DB_CREDENTIALS)
     cur = conn.cursor()
-    cur.execute("INSERT INTO invokes (function_name, invoke_time, new_data) VALUES (%s, now(), %s)", ("vaccines", new_data))
+    cur.execute(
+        "INSERT INTO invokes (function_name, invoke_time, new_data) VALUES (%s, now(), %s)",
+        ("vaccines", new_data),
+    )
     conn.commit()
     conn.close()
 
@@ -75,22 +85,22 @@ def save_vaccine_data_to_db(clean_data):
     for day in clean_data:
         i += 1
 
-        sql_date = reporting_date_to_formatted(day.get('date'))
+        sql_date = reporting_date_to_formatted(day.get("date"))
         sql_data = (
             sql_date,
-            day.get('daily_increase'),
-            day.get('daily_cumulative'),
-            day.get('one_dose_increase'),
-            day.get('one_dose_cumulative'),
-            day.get('two_doses_increase'),
-            day.get('two_doses_cumulative'),
-            day.get('pfizer_daily'),
-            day.get('moderna_daily'),
-            day.get('pfizer_cumulative'),
-            day.get('moderna_cumulative'),
-            day.get('distributed_increase'),
-            day.get('distributed_cumulative'),
-            day.get('total_vaccine_providers'),
+            day.get("daily_increase"),
+            day.get("daily_cumulative"),
+            day.get("one_dose_increase"),
+            day.get("one_dose_cumulative"),
+            day.get("two_doses_increase"),
+            day.get("two_doses_cumulative"),
+            day.get("pfizer_daily"),
+            day.get("moderna_daily"),
+            day.get("pfizer_cumulative"),
+            day.get("moderna_cumulative"),
+            day.get("distributed_increase"),
+            day.get("distributed_cumulative"),
+            day.get("total_vaccine_providers"),
         )
 
         sql_vars = sql_data + sql_data + (sql_date,)
@@ -139,7 +149,7 @@ def format_day(date):
 
 
 def new_day_formatted():
-    new_day = fetch_latest_day_data()['reporting_date'] + timedelta(days=1)
+    new_day = fetch_latest_day_data()["reporting_date"] + timedelta(days=1)
     return format_day(new_day)
 
 
@@ -168,7 +178,7 @@ def clean_vaccine_data(raw_data):
 
 def extract_vaccine_data(raw_data):
     daily_data = raw_data["features"]
-    return [day['properties'] for day in daily_data]
+    return [day["properties"] for day in daily_data]
 
 
 def filter_latest_vaccine_data(daily_data):
@@ -176,11 +186,19 @@ def filter_latest_vaccine_data(daily_data):
     state_counts = []
     new_day = new_day_formatted()
     for cat in daily_data:
-        if cat['publish_date'] == new_day and cat['category'] == "Administration" and cat['metric'] != 'Weekly' and cat['type'] != 'Unspecified COVID Vaccine':
+        if (
+            cat["publish_date"] == new_day
+            and cat["category"] == "Administration"
+            and cat["metric"] != "Weekly"
+            and cat["type"] != "Unspecified COVID Vaccine"
+        ):
             administration_counts.append(cat)
-        if cat['category'] == "Cumulative counts to date" and cat['section'] == "State Data":
+        if (
+            cat["category"] == "Cumulative counts to date"
+            and cat["section"] == "State Data"
+        ):
             state_counts.append(cat)
-            state_counts[-1]['date'] = state_counts[-1]['publish_date']
+            state_counts[-1]["date"] = state_counts[-1]["publish_date"]
     return administration_counts, state_counts
 
 
@@ -188,43 +206,51 @@ def flatten_data(days):
     new_day = new_day_formatted()
     return [
         {
-            'metric': day['metric'], 'type': day['type'], 'date': day['date'], 'value': day['value'], 'publish_date': day['publish_date'],
-        } for day in days if day['publish_date'] == new_day
+            "metric": day["metric"],
+            "type": day["type"],
+            "date": day["date"],
+            "value": day["value"],
+            "publish_date": day["publish_date"],
+        }
+        for day in days
+        if day["publish_date"] == new_day
     ]
 
 
 def combine_counts(flattened_data, state_counts):
     combined_daily = {}
     for day in flattened_data:
-        if not combined_daily.get(day['date']):
-            combined_daily[day['date']] = {}
+        if not combined_daily.get(day["date"]):
+            combined_daily[day["date"]] = {}
         try:
-            combined_daily[day['date']][day['type'] + ' ' + day['metric']] = day['value']
+            combined_daily[day["date"]][day["type"] + " " + day["metric"]] = day[
+                "value"
+            ]
         except:
-            combined_daily[day['date']][day['metric']] = day['value']
+            combined_daily[day["date"]][day["metric"]] = day["value"]
 
     for day in state_counts:
-        if not combined_daily.get(day['date']):
-            combined_daily[day['date']] = {}
-        combined_daily[day['date']][day['metric']] = day['value']
-    
-    return [{'date': day[0], **day[1]} for day in combined_daily.items()]
+        if not combined_daily.get(day["date"]):
+            combined_daily[day["date"]] = {}
+        combined_daily[day["date"]][day["metric"]] = day["value"]
+
+    return [{"date": day[0], **day[1]} for day in combined_daily.items()]
 
 
 def standardize_metric_names(sorted_data):
     replacements = {
-        'All COVID Vaccines Cumulative Daily': 'daily_cumulative',
-        'Moderna Cumulative Daily': 'moderna_cumulative',
-        'Pfizer Cumulative Daily': 'pfizer_cumulative',
-        'All COVID Vaccines Daily': 'daily',
-        'Moderna Daily': 'moderna_daily',
-        'Pfizer Daily': 'pfizer_daily',
-        'People Immunized with One Dose': 'one_dose_cumulative',
-        'People Immunized with Two Doses': 'two_doses_cumulative',
-        'date': 'date',
-        'Cumulative Doses Administered': 'daily_cumulative_2',
-        'Cumulative Doses Distributed': 'distributed_cumulative',
-        'Total Vaccine Providers': 'total_vaccine_providers',
+        "All COVID Vaccines Cumulative Daily": "daily_cumulative",
+        "Moderna Cumulative Daily": "moderna_cumulative",
+        "Pfizer Cumulative Daily": "pfizer_cumulative",
+        "All COVID Vaccines Daily": "daily",
+        "Moderna Daily": "moderna_daily",
+        "Pfizer Daily": "pfizer_daily",
+        "People Immunized with One Dose": "one_dose_cumulative",
+        "People Immunized with Two Doses": "two_doses_cumulative",
+        "date": "date",
+        "Cumulative Doses Administered": "daily_cumulative_2",
+        "Cumulative Doses Distributed": "distributed_cumulative",
+        "Total Vaccine Providers": "total_vaccine_providers",
     }
     updated_data = []
     for day in sorted_data:
@@ -236,11 +262,11 @@ def standardize_metric_names(sorted_data):
         updated_data.append(temp_day)
 
     for day in updated_data:
-        if day.get('daily_cumulative_2'):
-            day['daily_cumulative'] = day.get('daily_cumulative_2')
-            del day['daily_cumulative_2']
-        if day.get('daily'): # confusing metric that isn't what it says
-            del day['daily']
+        if day.get("daily_cumulative_2"):
+            day["daily_cumulative"] = day.get("daily_cumulative_2")
+            del day["daily_cumulative_2"]
+        if day.get("daily"):  # confusing metric that isn't what it says
+            del day["daily"]
     return updated_data
 
 
@@ -248,34 +274,52 @@ def add_metric_increases(standardized_data):
     total_days = len(standardized_data)
     for i in range(total_days):
         if i == 0:
-            standardized_data[i]["daily_increase"] = standardized_data[i].get("daily_cumulative")
-            standardized_data[i]["distributed_increase"] = standardized_data[i].get("distributed_cumulative")
-            standardized_data[i]["one_dose_increase"] = standardized_data[i].get("one_dose_cumulative")
-            standardized_data[i]["one_dose_increase"] = standardized_data[i].get("two_doses_cumulative")
+            standardized_data[i]["daily_increase"] = standardized_data[i].get(
+                "daily_cumulative"
+            )
+            standardized_data[i]["distributed_increase"] = standardized_data[i].get(
+                "distributed_cumulative"
+            )
+            standardized_data[i]["one_dose_increase"] = standardized_data[i].get(
+                "one_dose_cumulative"
+            )
+            standardized_data[i]["one_dose_increase"] = standardized_data[i].get(
+                "two_doses_cumulative"
+            )
         else:
             try:
-                standardized_data[i]["daily_increase"] = standardized_data[i].get("daily_cumulative") - standardized_data[i - 1].get("daily_cumulative", 0)
+                standardized_data[i]["daily_increase"] = standardized_data[i].get(
+                    "daily_cumulative"
+                ) - standardized_data[i - 1].get("daily_cumulative", 0)
             except TypeError:
                 standardized_data[i]["daily_increase"] = None
-            
+
             try:
-                standardized_data[i]["distributed_increase"] = standardized_data[i].get("distributed_cumulative") - standardized_data[i - 1].get("distributed_cumulative", 0)
+                standardized_data[i]["distributed_increase"] = standardized_data[i].get(
+                    "distributed_cumulative"
+                ) - standardized_data[i - 1].get("distributed_cumulative", 0)
             except TypeError:
                 standardized_data[i]["distributed_increase"] = None
-            
+
             try:
-                standardized_data[i]["one_dose_increase"] = standardized_data[i].get("one_dose_cumulative") - standardized_data[i - 1].get("one_dose_cumulative", 0)
+                standardized_data[i]["one_dose_increase"] = standardized_data[i].get(
+                    "one_dose_cumulative"
+                ) - standardized_data[i - 1].get("one_dose_cumulative", 0)
             except TypeError:
                 standardized_data[i]["one_dose_increase"] = None
             try:
-                standardized_data[i]["two_doses_increase"] = standardized_data[i].get("two_doses_cumulative") - standardized_data[i - 1].get("two_doses_cumulative", 0)
+                standardized_data[i]["two_doses_increase"] = standardized_data[i].get(
+                    "two_doses_cumulative"
+                ) - standardized_data[i - 1].get("two_doses_cumulative", 0)
             except TypeError:
                 standardized_data[i]["two_doses_increase"] = None
     return standardized_data
 
 
 def sort_data(combined_data):
-    return sorted(combined_data, key=lambda day: datetime.strptime(day["date"], "%m/%d/%Y"))
+    return sorted(
+        combined_data, key=lambda day: datetime.strptime(day["date"], "%m/%d/%Y")
+    )
 
 
 def reporting_date_to_formatted(date):
@@ -312,4 +356,3 @@ def raw_s3_filename():
 def clean_s3_filename():
     today = datetime.today() - timedelta(hours=7)
     return f"data/clean_vaccine_data/{today.strftime('%Y%m%d')}.json"
-

@@ -31,7 +31,7 @@ sql = """CREATE TABLE IF NOT EXISTS vaccines (reporting_date date PRIMARY KEY,
 
 cur.execute(sql)
 
-sql = """CREATE TABLE IF NOT EXISTS invokes (id integer PRIMARY KEY, function_name varchar(40) NOT NULL,
+sql = """CREATE TABLE IF NOT EXISTS invokes (id SERIAL PRIMARY KEY, function_name varchar(40) NOT NULL,
     invoke_time timestamp not null default CURRENT_TIMESTAMP, new_data boolean);"""
 
 conn.commit()

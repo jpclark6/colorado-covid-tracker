@@ -9,7 +9,6 @@ Parameters:
     Type: String
 Globals:
   Function:
-    Timeout: 120
     Environment:
       Variables:
         S3_BUCKET: !Ref S3Bucket
@@ -24,6 +23,7 @@ Resources:
       CodeUri: src/api/
       Handler: app.app
       Runtime: python3.8
+      Timeout: 15
       Policies:
         - S3FullAccessPolicy:
             BucketName: !Ref S3Bucket
@@ -84,6 +84,8 @@ Resources:
       CodeUri: src/data/
       Handler: cases.handler
       Runtime: python3.8
+      Timeout: 30
+      MemorySize: 150
       Policies:
         - S3FullAccessPolicy:
             BucketName: !Ref S3Bucket
@@ -100,6 +102,8 @@ Resources:
       CodeUri: src/data/
       Handler: vaccines.handler
       Runtime: python3.8
+      Timeout: 60
+      MemorySize: 350
       Policies:
         - S3FullAccessPolicy:
             BucketName: !Ref S3Bucket
@@ -126,16 +130,16 @@ Resources:
       Dimensions:
         - Name: APIFunction
           Value: !Ref CoCovidFunction
-        - Name: CasesFunction
-          Value: !Ref CasesDataFunction
-        - Name: VaccineFunction
-          Value: !Ref VaccineDataFunction
+        # - Name: CasesFunction
+        #   Value: !Ref CasesDataFunction
+        # - Name: VaccineFunction
+        #   Value: !Ref VaccineDataFunction
       EvaluationPeriods: 1
       MetricName: Errors
       Namespace: AWS/Lambda
       Period: 120
       Statistic: Sum
-      Threshold: 1
+      Threshold: '1'
 
   S3Bucket:
     Type: AWS::S3::Bucket

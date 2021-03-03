@@ -6,8 +6,7 @@ import boto3
 import psycopg2
 
 
-FROZEN_TIME_AFTER_6PM = datetime(2021, 10, 5, 3, 2, 1, 142314)
-FROZEN_TIME_BEFORE_6PM = datetime(2021, 10, 5, 0, 2, 1, 142314)
+FROZEN_TIME = datetime(2021, 10, 5, 3, 2, 1, 142314)
 
 
 @pytest.fixture
@@ -25,25 +24,11 @@ def local_api(monkeypatch, mock_return):
 
 
 @pytest.fixture
-def freeze_datetime_after_6pm(monkeypatch):
+def freeze_datetime(monkeypatch):
     class ftdatetime:
         @classmethod
         def utcnow(cls):
-            return FROZEN_TIME_AFTER_6PM
-        
-        @classmethod
-        def strptime(cls, date, formatting):
-            return datetime.strptime(date, '%Y-%m-%d %H:%M:%S.%f')
-
-    monkeypatch.setattr("src.api.app.datetime", ftdatetime)
-
-
-@pytest.fixture
-def freeze_datetime_before_6pm(monkeypatch):
-    class ftdatetime:
-        @classmethod
-        def utcnow(cls):
-            return FROZEN_TIME_BEFORE_6PM
+            return FROZEN_TIME
         
         @classmethod
         def strptime(cls, date, formatting):

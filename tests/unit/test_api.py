@@ -6,7 +6,7 @@ import boto3
 import psycopg2
 
 
-def test_data_endpoint(monkeypatch, apigw_event, mocker, local_api, freeze_datetime_after_6pm):
+def test_data_endpoint(monkeypatch, apigw_event, mocker, local_api, freeze_datetime):
     def daily_cases():
         return {"mock": "daily_cases"}
 
@@ -35,8 +35,8 @@ def test_data_endpoint(monkeypatch, apigw_event, mocker, local_api, freeze_datet
     assert data['last_updated'] == '2021-10-05 03:02:01.142314'
 
 
-def test_valid_cache(monkeypatch, apigw_event, mocker, local_api, freeze_datetime_after_6pm):
-    mock_passing_date = {"data": "mock", "last_updated": '2021-10-05 01:02:01.142314'}
+def test_valid_cached_response(monkeypatch, apigw_event, mocker, local_api, freeze_datetime):
+    mock_passing_date = {"data": "mock", "last_updated": '2021-10-05 03:12:01.142314'}
     local_api.todays_data = mock_passing_date
 
     ret = local_api.app(apigw_event, "")
@@ -45,32 +45,18 @@ def test_valid_cache(monkeypatch, apigw_event, mocker, local_api, freeze_datetim
     assert data == mock_passing_date
 
 
-def test_valid_cache_after_6pm(monkeypatch, apigw_event, mocker, local_api, freeze_datetime_after_6pm):
-    invalid_datetime = '2021-10-05 00:02:01.142314'
+def test_expired_data(monkeypatch, apigw_event, local_api, freeze_datetime):
+    invalid_datetime = '2021-10-05 02:45:01.142314'
     still_valid = local_api.data_still_valid(invalid_datetime)
 
     assert still_valid == False
 
 
-def test_valid_cache_before_6pm(monkeypatch, apigw_event, local_api, freeze_datetime_before_6pm):
-    valid_datetime = '2021-10-05 00:02:01.142314'
-    still_valid = local_api.data_still_valid(valid_datetime)
+def test_valid_data(monkeypatch, apigw_event, local_api, freeze_datetime):
+    invalid_datetime = '2021-10-05 02:50:01.142314'
+    still_valid = local_api.data_still_valid(invalid_datetime)
 
     assert still_valid == True
-
-
-def test_expired_cache_same_day_but_before_new_data(monkeypatch, apigw_event, local_api, freeze_datetime_after_6pm):
-    invalid_datetime = '2021-10-05 00:02:01.142314'
-    still_valid = local_api.data_still_valid(invalid_datetime)
-
-    assert still_valid == False
-
-
-def test_expired_cache_previous_day(monkeypatch, apigw_event, local_api, freeze_datetime_after_6pm):
-    invalid_datetime = '2021-10-04 06:02:01.142314'
-    still_valid = local_api.data_still_valid(invalid_datetime)
-
-    assert still_valid == False
 
 
 def test_get_formatted_daily_data(monkeypatch, local_api):
