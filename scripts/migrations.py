@@ -24,8 +24,8 @@ cur.execute(sql)
 
 sql = """CREATE TABLE IF NOT EXISTS vaccines (reporting_date date PRIMARY KEY, 
     daily_qty integer, daily_cumulative integer, one_dose_increase integer, one_dose_total integer, 
-    two_doses_increase integer, two_doses_total integer, daily_pfizer integer, daily_moderna integer,
-    pfizer_total integer, moderna_total integer, distributed_increase integer, distrubuted_total integer, 
+    fully_immunized_increase integer, fully_immunized_total integer, daily_pfizer integer, daily_moderna integer, daily_jandj integer,
+    pfizer_total integer, moderna_total integer, jandj_total integer, distributed_increase integer, distrubuted_total integer, 
     total_vaccine_providers integer, created_at timestamp not null default CURRENT_TIMESTAMP, 
     updated_at timestamp not null default CURRENT_TIMESTAMP);"""
 

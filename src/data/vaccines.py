@@ -92,8 +92,8 @@ def save_vaccine_data_to_db(clean_data):
             day.get("daily_cumulative"),
             day.get("one_dose_increase"),
             day.get("one_dose_cumulative"),
-            day.get("two_doses_increase"),
-            day.get("two_doses_cumulative"),
+            day.get("fully_immunized_increase"),
+            day.get("fully_immunized_cumulative"),
             day.get("pfizer_daily"),
             day.get("moderna_daily"),
             day.get("pfizer_cumulative"),
@@ -101,18 +101,22 @@ def save_vaccine_data_to_db(clean_data):
             day.get("distributed_increase"),
             day.get("distributed_cumulative"),
             day.get("total_vaccine_providers"),
+            day.get("jandj_daily"),
+            day.get("jandj_cumulative"),
         )
 
         sql_vars = sql_data + sql_data + (sql_date,)
 
         sql = """
             INSERT INTO vaccines (reporting_date, daily_qty, daily_cumulative, one_dose_increase, 
-            one_dose_total, two_doses_increase, two_doses_total, daily_pfizer, daily_moderna,
-            pfizer_total, moderna_total, distributed_increase, distrubuted_total, total_vaccine_providers)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT (reporting_date) DO UPDATE SET
+            one_dose_total, fully_immunized_increase, fully_immunized_total, daily_pfizer, daily_moderna,
+            pfizer_total, moderna_total, distributed_increase, distrubuted_total, total_vaccine_providers,
+            daily_jandj, jandj_total)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT (reporting_date) DO UPDATE SET
             reporting_date = %s, daily_qty = %s, daily_cumulative = %s, one_dose_increase = %s,
-            one_dose_total = %s, two_doses_increase = %s, two_doses_total = %s, daily_pfizer = %s, daily_moderna = %s,
-            pfizer_total = %s, moderna_total = %s, distributed_increase = %s, distrubuted_total = %s, total_vaccine_providers = %s
+            one_dose_total = %s, fully_immunized_increase = %s, fully_immunized_total = %s, daily_pfizer = %s, daily_moderna = %s,
+            pfizer_total = %s, moderna_total = %s, distributed_increase = %s, distrubuted_total = %s, total_vaccine_providers = %s,
+            daily_jandj = %s, jandj_total = %s
             WHERE vaccines.reporting_date = %s;
         """
 
@@ -136,7 +140,7 @@ def fetch_latest_day_data():
             "reporting_date": response[0],
             "daily": response[2],
             "one_dose": response[4],
-            "two_doses": response[6],
+            "fully_immunized": response[6],
         }
     else:
         return {
@@ -242,11 +246,13 @@ def standardize_metric_names(sorted_data):
         "All COVID Vaccines Cumulative Daily": "daily_cumulative",
         "Moderna Cumulative Daily": "moderna_cumulative",
         "Pfizer Cumulative Daily": "pfizer_cumulative",
+        "Janssen Cumulative Daily": "jandj_cumulative",
         "All COVID Vaccines Daily": "daily",
         "Moderna Daily": "moderna_daily",
         "Pfizer Daily": "pfizer_daily",
+        "Janssen Daily": "jandj_daily",
         "People Immunized with One Dose": "one_dose_cumulative",
-        "People Immunized with Two Doses": "two_doses_cumulative",
+        "People Fully Immunized": "fully_immunized_cumulative",
         "date": "date",
         "Cumulative Doses Administered": "daily_cumulative_2",
         "Cumulative Doses Distributed": "distributed_cumulative",
@@ -286,8 +292,8 @@ def add_metric_increases(standardized_data):
             standardized_data[i]["one_dose_increase"] = standardized_data[i].get(
                 "one_dose_cumulative"
             )
-            standardized_data[i]["one_dose_increase"] = standardized_data[i].get(
-                "two_doses_cumulative"
+            standardized_data[i]["fully_immunized_increase"] = standardized_data[i].get(
+                "fully_immunized_cumulative"
             )
         else:
             try:
@@ -311,11 +317,11 @@ def add_metric_increases(standardized_data):
             except TypeError:
                 standardized_data[i]["one_dose_increase"] = None
             try:
-                standardized_data[i]["two_doses_increase"] = standardized_data[i].get(
-                    "two_doses_cumulative"
-                ) - standardized_data[i - 1].get("two_doses_cumulative", 0)
+                standardized_data[i]["fully_immunized_increase"] = standardized_data[i].get(
+                    "fully_immunized_cumulative"
+                ) - standardized_data[i - 1].get("fully_immunized_cumulative", 0)
             except TypeError:
-                standardized_data[i]["two_doses_increase"] = None
+                standardized_data[i]["fully_immunized_increase"] = None
     return standardized_data
 
 
