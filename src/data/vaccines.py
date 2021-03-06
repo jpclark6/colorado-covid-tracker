@@ -258,7 +258,10 @@ def standardize_metric_names(sorted_data):
         for key, val in day.items():
             if "Weekly" in key:
                 continue
-            temp_day[replacements[key]] = val
+            try:
+                temp_day[replacements[key]] = val
+            except KeyError:
+                logger.error(f"Found unknown key: {key}")
         updated_data.append(temp_day)
 
     for day in updated_data:
