@@ -49,6 +49,14 @@ def handler(event=None, context=None):
         logger.info("Saving to database")
         save_case_data_to_db(clean_data)
         log_update_time(new_data=True)
+        try:
+            # only check and write data if during automated hours
+            # to avoid accidental overwrite of good data during
+            # debugging or off hours update
+            if datetime.utcnow().hour in [0, 1, 2, 3, 23]:
+                update_currently_hospitalized()
+        except:
+            logger.error("Unable to successfully fetch currently hospitalized")
 
         logger.info("Success")
         invalidate_cache()
@@ -222,3 +230,46 @@ def raw_s3_filename():
 def clean_s3_filename():
     today = datetime.today() - timedelta(hours=7)
     return f"data/clean_case_data/{today.strftime('%Y%m%d')}.json"
+
+
+def update_currently_hospitalized():
+    # for some reason this stat isn't included in the API
+    # and I can only find it on the website, so need to scrape
+    value = get_currently_hospitalized()
+    save_currently_hospitalized(value)
+
+
+def get_currently_hospitalized():
+    website = requests.get("https://covid19.colorado.gov/data").text
+    # good luck!
+    snippet = website.split("Number of patients currently hospitalized for confirmed COVID-19")[1].split("Patients currently hospitalized as COVID-19 persons under investigation")[0]
+    data = int(snippet.split('">')[1].split("<")[0])
+    return data
+
+
+def save_currently_hospitalized(value):
+    last_day = fetch_latest_day_data()["reporting_date"]
+
+    conn = psycopg2.connect(DB_CREDENTIALS)
+    cur = conn.cursor()
+
+    sql = "UPDATE cases SET hospitalized_currently = %s WHERE reporting_date = %s;"
+    cur.execute(sql, (value, last_day))
+    conn.commit()
+    conn.close()
+
+
+    # https://covid19.colorado.gov/data
+    	# <table border="2" cellpadding="2" cellspacing="1" style="width: 100%;"><thead></thead><tbody><tr><td style="width: 944px;">Percent of facilities updating (within 24 hours)</td>
+        #     <td style="width: 240px;">90%</td>
+        # </tr><tr><td style="width: 944px;">Number of patients currently hospitalized for confirmed COVID-19
+        # 
+        # </td>
+        #     <td style="width: 240px;">
+        # 299</td>
+        # </tr><tr><td style="width: 944px;">
+        # 
+        # Patients currently hospitalized as COVID-19 persons under investigation</td>
+        #     <td style="width: 240px;">54</td>
+        # </tr><tr><td style="width: 944px;">Number of patients discharged/transferred within past the 24 hours</td>
+        #     <td style="width: 240px;">39</td>
