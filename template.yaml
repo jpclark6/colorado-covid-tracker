@@ -15,6 +15,7 @@ Globals:
         DB_CREDENTIALS: '{{resolve:ssm:/colorado-covid/database:1}}'
         INVALIDATE_CACHE_KEY: '{{resolve:ssm:/colorado-covid/invalidate_cache_key:1}}'
         API_URL: '{{resolve:ssm:/colorado-covid/api_url:1}}'
+        EMAIL_TOPIC: !Ref EmailTopic
 
 Resources:
   CoCovidFunction:
@@ -27,7 +28,8 @@ Resources:
       Policies:
         - S3FullAccessPolicy:
             BucketName: !Ref S3Bucket
-        - AmazonSSMReadOnlyAccess
+        - SNSPublishMessagePolicy:
+            TopicName: !Ref EmailTopic
       Events:
         AllData:
           Type: Api
@@ -89,7 +91,8 @@ Resources:
       Policies:
         - S3FullAccessPolicy:
             BucketName: !Ref S3Bucket
-        - AmazonSSMReadOnlyAccess
+        - SNSPublishMessagePolicy:
+            TopicName: !Ref EmailTopic
       Events:
         CaseEvent:
           Type: Schedule
@@ -107,39 +110,36 @@ Resources:
       Policies:
         - S3FullAccessPolicy:
             BucketName: !Ref S3Bucket
-        - AmazonSSMReadOnlyAccess
+        - SNSPublishMessagePolicy:
+            TopicName: !Ref EmailTopic
       Events:
         VacEvent:
           Type: Schedule
           Properties:
             Schedule: cron(*/10 0,1,2,3,23 * * ? *)
 
-  AlarmTopic:
+  DailyDataCheckFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/data/
+      Handler: check.handler
+      Runtime: python3.8
+      Timeout: 60
+      Policies:
+        - SNSPublishMessagePolicy:
+            TopicName: !Ref EmailTopic
+      Events:
+        VacEvent:
+          Type: Schedule
+          Properties:
+            Schedule: cron(*/10 0,1,2,3,23 * * ? *)
+
+  EmailTopic:
     Type: AWS::SNS::Topic
     Properties:
       Subscription:
       - Protocol: email
         Endpoint: !Ref NotificationEmail
-
-  Alarm:
-    Type: AWS::CloudWatch::Alarm
-    Properties:
-      AlarmActions:
-        - !Ref AlarmTopic
-      ComparisonOperator: GreaterThanOrEqualToThreshold
-      Dimensions:
-        - Name: APIFunction
-          Value: !Ref CoCovidFunction
-        # - Name: CasesFunction
-        #   Value: !Ref CasesDataFunction
-        # - Name: VaccineFunction
-        #   Value: !Ref VaccineDataFunction
-      EvaluationPeriods: 1
-      MetricName: Errors
-      Namespace: AWS/Lambda
-      Period: 120
-      Statistic: Sum
-      Threshold: '1'
 
   S3Bucket:
     Type: AWS::S3::Bucket

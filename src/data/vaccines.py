@@ -26,35 +26,47 @@ API_URL = (
 # will every 15 minutes per the normal schedule
 INVALIDATE_CACHE_KEY = os.getenv("INVALIDATE_CACHE_KEY")
 API_GATEWAY_URL = os.getenv("API_URL")
+EMAIL_TOPIC = os.getenv("EMAIL_TOPIC")
 
 s3_client = boto3.client("s3")
+sns_client = boto3.client("sns")
 
 
 def handler(event=None, context=None):
-    logger.info("Requesting raw data")
-    raw_data = get_raw_vaccine_data()
+    try:
+        logger.info("Requesting raw data")
+        raw_data = get_raw_vaccine_data()
 
-    if new_day_formatted() in str(raw_data):
-        s3_filename = raw_s3_filename()
-        logger.info(f"New data found. Saving to s3://{BUCKET}/{s3_filename}")
-        save_to_s3(raw_data, s3_filename)
+        if new_day_formatted() in str(raw_data):
+            s3_filename = raw_s3_filename()
+            logger.info(f"New data found. Saving to s3://{BUCKET}/{s3_filename}")
+            save_to_s3(raw_data, s3_filename)
 
-        logger.info("Saved to S3. Cleaning data")
-        clean_data = clean_vaccine_data(raw_data)
+            logger.info("Saved to S3. Cleaning data")
+            clean_data = clean_vaccine_data(raw_data)
 
-        s3_filename = clean_s3_filename()
-        logger.info(f"Saving cleaned data to s3://{BUCKET}/{s3_filename}")
-        save_to_s3(clean_data, s3_filename)
+            s3_filename = clean_s3_filename()
+            logger.info(f"Saving cleaned data to s3://{BUCKET}/{s3_filename}")
+            save_to_s3(clean_data, s3_filename)
 
-        logger.info("Saving cleaned data to database")
-        save_vaccine_data_to_db(clean_data)
-        log_update_time(new_data=True)
+            logger.info("Saving cleaned data to database")
+            save_vaccine_data_to_db(clean_data)
+            log_update_time(new_data=True)
 
-        logger.info("Success")
-        invalidate_cache()
-    else:
-        logger.info("Data not updated yet")
-        log_update_time(new_data=False)
+            logger.info("Success")
+            invalidate_cache()
+        else:
+            logger.info("Data not updated yet")
+            log_update_time(new_data=False)
+    except Exception as e:
+        message = f"Encountered an error during Vaccine data fetching: {f}"
+        topic = "ColoradoCovidData Error - Vaccines"
+        sns_client.publish(
+            TopicArn=EMAIL_TOPIC,
+            Message=message,
+            Subject=subject,
+        )
+        logger.error(message)
 
 
 def invalidate_cache():

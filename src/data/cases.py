@@ -26,43 +26,49 @@ API_URL = (
 # will every 15 minutes per the normal schedule
 INVALIDATE_CACHE_KEY = os.getenv("INVALIDATE_CACHE_KEY")
 API_GATEWAY_URL = os.getenv("API_URL")
+EMAIL_TOPIC = os.getenv("EMAIL_TOPIC")
 
 s3_client = boto3.client("s3")
+sns_client = boto3.client("sns")
 
 
 def handler(event=None, context=None):
-    logger.info("Requesting raw data")
-    raw_data = get_raw_case_data()
+    try:
+        logger.info("Requesting raw data")
+        raw_data = get_raw_case_data()
 
-    if next_day() in str(raw_data):
-        s3_filename = raw_s3_filename()
-        logger.info(f"New data found. Saving to s3://{BUCKET}/{s3_filename}")
-        save_to_s3(raw_data, s3_filename)
+        if next_day() in str(raw_data):
+            s3_filename = raw_s3_filename()
+            logger.info(f"New data found. Saving to s3://{BUCKET}/{s3_filename}")
+            save_to_s3(raw_data, s3_filename)
 
-        logger.info("Cleaning data")
-        clean_data = clean_cases_data(raw_data)
+            logger.info("Cleaning data")
+            clean_data = clean_cases_data(raw_data)
 
-        s3_filename = clean_s3_filename()
-        logger.info(f"Saving cleaned data to s3://{BUCKET}/{s3_filename}")
-        save_to_s3(clean_data, s3_filename)
+            s3_filename = clean_s3_filename()
+            logger.info(f"Saving cleaned data to s3://{BUCKET}/{s3_filename}")
+            save_to_s3(clean_data, s3_filename)
 
-        logger.info("Saving to database")
-        save_case_data_to_db(clean_data)
-        log_update_time(new_data=True)
-        try:
-            # only check and write data if during automated hours
-            # to avoid accidental overwrite of good data during
-            # debugging or off hours update
-            if datetime.utcnow().hour in [0, 1, 2, 3, 23]:
-                update_currently_hospitalized()
-        except:
-            logger.error("Unable to successfully fetch currently hospitalized")
+            logger.info("Saving to database")
+            save_case_data_to_db(clean_data)
+            log_update_time(new_data=True)
 
-        logger.info("Success")
-        invalidate_cache()
-    else:
-        logger.info("Data not updated yet")
-        log_update_time(new_data=False)
+            update_currently_hospitalized()
+
+            logger.info("Success")
+            invalidate_cache()
+        else:
+            logger.info("Data not updated yet")
+            log_update_time(new_data=False)
+    except Exception as e:
+        message = f"Encountered an error during Cases data fetching: {f}"
+        topic = "ColoradoCovidData Error - Cases"
+        sns_client.publish(
+            TopicArn=EMAIL_TOPIC,
+            Message=message,
+            Subject=subject,
+        )
+        logger.error(message)
 
 
 def invalidate_cache():
@@ -235,8 +241,23 @@ def clean_s3_filename():
 def update_currently_hospitalized():
     # for some reason this stat isn't included in the API
     # and I can only find it on the website, so need to scrape
-    value = get_currently_hospitalized()
-    save_currently_hospitalized(value)
+    # only check and write data if during automated hours
+    # to avoid accidental overwrite of good data during
+    # debugging or off hours update
+    try:
+        if datetime.utcnow().hour not in [0, 1, 2, 3, 23]:
+            return
+        value = get_currently_hospitalized()
+        save_currently_hospitalized(value)
+    except Exception as e:
+        message = f"Unable to successfully fetch currently hospitalized data: {f}"
+        topic = "ColoradoCovidData Error - Currently Hospitalized"
+        sns_client.publish(
+            TopicArn=EMAIL_TOPIC,
+            Message=message,
+            Subject=subject,
+        )
+        logger.error(message)
 
 
 def get_currently_hospitalized():

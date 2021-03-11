@@ -27,6 +27,9 @@ if not INVALIDATE_CACHE_KEY:
 
 todays_data = {}  # stores full data set; global var to cache data with Lambda
 
+EMAIL_TOPIC = os.getenv("EMAIL_TOPIC")
+sns_client = boto3.client("sns")
+
 
 @app.route("/data/")
 @cross_origin()
