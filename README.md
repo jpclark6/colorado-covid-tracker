@@ -105,7 +105,7 @@ The API uses a lambda function with API Gateway. Since the data is valid for 24 
 
 ## Roadmap
 
-1. Add logging to SAM template
+1. Get rid of psycopg2 and just use SQLAlchemy due to increasing complexity
 1. After new data comes out stop requesting data for the rest of the day
 
 ## License
