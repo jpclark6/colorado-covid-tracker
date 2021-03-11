@@ -43,35 +43,11 @@ Resources:
               Throttle:
                 BurstLimit: 100
                 RateLimit: 100
-        HealthCheck:
-          Type: Api
-          Properties:
-            Path: /health/
-            Method: get
-          Auth:
-            UsagePlan:
-              CreateUsagePlan: PER_API
-              Description: Usage plan for this API
-              Throttle:
-                BurstLimit: 1
-                RateLimit: 1
         InvalidateCache:
           Type: Api
           Properties:
             Path: /invalidate_cache/
             Method: post
-          Auth:
-            UsagePlan:
-              CreateUsagePlan: PER_API
-              Description: Usage plan for this API
-              Throttle:
-                BurstLimit: 1
-                RateLimit: 1
-        ErrorCheck:
-          Type: Api
-          Properties:
-            Path: /throwerror/
-            Method: get
           Auth:
             UsagePlan:
               CreateUsagePlan: PER_API
@@ -97,7 +73,7 @@ Resources:
         CaseEvent:
           Type: Schedule
           Properties:
-            Schedule: cron(*/10 0,1,2,3,23 * * ? *)
+            Schedule: cron(*/10 0,1,2,3,23 * * ? *) # Every 10 min from 4PM to 9PM
 
   VaccineDataFunction:
     Type: AWS::Serverless::Function
@@ -116,7 +92,7 @@ Resources:
         VacEvent:
           Type: Schedule
           Properties:
-            Schedule: cron(*/10 0,1,2,3,23 * * ? *)
+            Schedule: cron(*/10 0,1,2,3,23 * * ? *) # Every 10 min from 4PM to 9PM
 
   DailyDataCheckFunction:
     Type: AWS::Serverless::Function
@@ -129,10 +105,26 @@ Resources:
         - SNSPublishMessagePolicy:
             TopicName: !Ref EmailTopic
       Events:
-        VacEvent:
+        DataCheckEvent:
           Type: Schedule
           Properties:
-            Schedule: cron(*/10 0,1,2,3,23 * * ? *)
+            Schedule: cron(0 4 * * ? *) # daily at 9PM MST
+
+  HealthCheckFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/api/
+      Handler: health_check.handler
+      Runtime: python3.8
+      Timeout: 60
+      Policies:
+        - SNSPublishMessagePolicy:
+            TopicName: !Ref EmailTopic
+      Events:
+        HealthEvent:
+          Type: Schedule
+          Properties:
+            Schedule: cron(0 * * * ? *) # once an hour
 
   EmailTopic:
     Type: AWS::SNS::Topic
