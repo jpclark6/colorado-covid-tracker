@@ -2,3 +2,4 @@ flask-lambda
 flask
 aws-psycopg2
 flask_cors
+requests
