@@ -329,9 +329,11 @@ def add_metric_increases(standardized_data):
             except TypeError:
                 standardized_data[i]["one_dose_increase"] = None
             try:
-                standardized_data[i]["fully_immunized_increase"] = standardized_data[i].get(
-                    "fully_immunized_cumulative"
-                ) - standardized_data[i - 1].get("fully_immunized_cumulative", 0)
+                standardized_data[i]["fully_immunized_increase"] = standardized_data[
+                    i
+                ].get("fully_immunized_cumulative") - standardized_data[i - 1].get(
+                    "fully_immunized_cumulative", 0
+                )
             except TypeError:
                 standardized_data[i]["fully_immunized_increase"] = None
     return standardized_data

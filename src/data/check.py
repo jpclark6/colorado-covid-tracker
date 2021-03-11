@@ -27,17 +27,19 @@ def handler(event=None, context=None):
     """
     Check if the database is up to date
     """
-    latest_day_cases = fetch_latest_day_data('cases')
-    latest_day_vaccines = fetch_latest_day_data('vaccines')
+    latest_day_cases = fetch_latest_day_data("cases")
+    latest_day_vaccines = fetch_latest_day_data("vaccines")
     today = datetime.utcnow()
 
     message = "Could not find current data for the following table(s): "
     tables = []
-    if latest_day_cases[0].day != today.day - 1: # sub 1 for UTC
+    if latest_day_cases[0].day != today.day - 1:  # sub 1 for UTC
         tables.append("Cases")
-    if not latest_day_cases[2]: # check if web scraping for currently hospitalized worked
+    if not latest_day_cases[
+        2
+    ]:  # check if web scraping for currently hospitalized worked
         tables.append("Currently Hospitalized")
-    if latest_day_vaccines[0].day != today.day - 1: # sub 1 for UTC
+    if latest_day_vaccines[0].day != today.day - 1:  # sub 1 for UTC
         tables.append("Vaccines")
     if tables:
         message += ", ".join(tables)
@@ -60,4 +62,4 @@ def fetch_latest_day_data(table):
     cur.execute(sql)
     data = cur.fetchone()
     conn.close()
-    return data # latest date datetime object
+    return data  # latest date datetime object
