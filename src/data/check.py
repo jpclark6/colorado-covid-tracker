@@ -51,8 +51,10 @@ def handler(event=None, context=None):
             Subject=subject,
         )
         logger.error(message)
+        return "Missing data"
     else:
         logger.info("Data looks good")
+        return "Data looks good"
 
 
 def fetch_latest_day_data(table):

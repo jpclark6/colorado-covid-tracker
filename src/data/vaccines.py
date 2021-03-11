@@ -58,6 +58,7 @@ def handler(event=None, context=None):
         else:
             logger.info("Data not updated yet")
             log_update_time(new_data=False)
+        return "Success"
     except Exception as e:
         message = f"Encountered an error during Vaccine data fetching: {f}"
         topic = "ColoradoCovidData Error - Vaccines"
@@ -67,6 +68,7 @@ def handler(event=None, context=None):
             Subject=subject,
         )
         logger.error(message)
+        return "Failed"
 
 
 def invalidate_cache():

@@ -30,3 +30,4 @@ def handler(event=None, context=None):
         logger.error(message)
     else:
         logger.info("Everything looks good")
+    return "Success"
