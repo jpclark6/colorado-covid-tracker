@@ -53,11 +53,7 @@ To get a copy up and running follow these simple steps.
 
 ### Prerequisites
 
- This project assumes you have an empty Postgres database handy. You will also need the AWS SAM CLI installed, and an AWS account.
-
-```sh
-$ ./scripts/setup.sh
-```
+This project assumes you have an empty Postgres database handy. You will also need the AWS SAM CLI installed, and an AWS account.
 
 You will also need to have some parameters saved to AWS SSM Parameter Store. Specifically:
 
@@ -73,15 +69,20 @@ You will also need to have some parameters saved to AWS SSM Parameter Store. Spe
     $ cd colorado-covid-tracker
     ```
 
-2. Visit the Google Drive with the [vaccine data](https://drive.google.com/drive/folders/1r095ofG8YvNj_dMWEq4XKkfhDaF8-I0n) and download the latest version. Save it in the `./scripts/data_files` directory.
+1. To run the migrations run the following script.
+    ```sh
+    $ ./scripts/setup.sh
+    ```
 
-3. Run the migration and backfill script which will make the required migrations in your database, and then backfill the vaccine data table with the file you downloaded. The case data will be backfilled once the Lambda function runs for the first time.
+1. Next optionally grab the currently hospitalized data file (since this data is strangely missing from the API) by following the directions after running the migration
 
-4. Build and deploy the package
+1. Build and deploy the package
     ```sh
     $ sam build
     $ sam deploy --guided
     ```
+
+1. The data will backfill automatically after it runs for the first time
 
 ### Running tests locally
 
@@ -98,15 +99,17 @@ You will also need to have some parameters saved to AWS SSM Parameter Store. Spe
 
 ## How it works
 
-When you deploy the package it creates the required resources to run this project. It creates two lambda functions which each download either case or vaccine data first in the raw form, then it saves it to S3, cleans the data and saves it to S3, and then loads the data into the Postgres DB for the API to use. Data is updated around 6PM MST but it changes daily. This checks every 10 minutes for new data from 4PM to 8PM daily. Once it finds new data it updates the DB and then invalidates the cached data in Lambda using a webhook.
+When you deploy the package it creates the required resources to run this project. It creates five lambda functions. Two go out and grab vaccine and case from the CO government's APIs. One is the API function. One checks that data was successfully entered at the end of each day, and one is a health check to make sure the API is working properly. If anything fails along the way there is also an SNS topic that will email you about the issue.
 
-The API uses a lambda function with API Gateway. Since the data is valid for 24 hours the lambda function can cache the data and then invalidate it when needed. This allows nearly limitless capacity with even the smallest  databases. Data is automatically invalidated after 15 minutes, or when the endpoint to invalidate the data is hit with the correct API key.
+Each function that grabs the API data first saves it to S3 in its raw form, then cleans the data and saves it to S3, and then loads the data into the Postgres DB for the API to use. The data comes in at a different time each day so the functions check every 10 minutes for new data throughout the evening from 4PM to 8PM. At 9PM the data-check lambda function confirms the day's data is in the database. As soon as new data is loaded the cached lambda data is invalidated and the new data becomes cached.
 
+The API uses a lambda function with API Gateway. Since the data is valid until new data is available (once every 24 hours) the lambda function can cache the data and then invalidate it when needed. This allows nearly limitless capacity with even the smallest  databases since only one DB call is required. Data is automatically invalidated on a timeout, or when the endpoint to invalidate the data is hit with the correct API key.
 
 ## Roadmap
 
-1. Get rid of psycopg2 and just use SQLAlchemy due to increasing complexity
+1. Get rid of psycopg2 and just use SQLAlchemy due to the increasing complexity of the tables
 1. After new data comes out stop requesting data for the rest of the day
+1. Find cool new data to save
 
 ## License
 
