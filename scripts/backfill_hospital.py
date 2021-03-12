@@ -1,3 +1,9 @@
+"""
+To run this file use the csv file path for the hospital data, and
+the database creds as command line args
+Ex. python backfill_hospital.py ./scripts/files/covid19_hospital_data_2021-03-08.csv postgres://user:password@host.com/db
+"""
+
 import csv
 import sys
 
@@ -26,9 +32,11 @@ if __name__ == "__main__":
     conn = psycopg2.connect(db_credentials)
     cur = conn.cursor()
     for day in hospitalized:
-        print(day)
+        print("Saving", day)
         sql = f"UPDATE cases SET hospitalized_currently = {day['value']} WHERE reporting_date = '{day['reporting_date']}';"
         cur.execute(sql)
 
     conn.commit()
     conn.close()
+
+    print("Success")
