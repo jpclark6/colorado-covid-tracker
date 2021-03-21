@@ -20,6 +20,7 @@ Globals:
 Resources:
   CoCovidFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    DependsOn: EmailTopic
     Properties:
       CodeUri: src/api/
       Handler: app.app
@@ -29,7 +30,7 @@ Resources:
         - S3FullAccessPolicy:
             BucketName: !Ref S3Bucket
         - SNSPublishMessagePolicy:
-            TopicName: !Ref EmailTopic
+            TopicName: !GetAtt EmailTopic.TopicName
       Events:
         AllData:
           Type: Api
@@ -58,6 +59,7 @@ Resources:
   
   CasesDataFunction:
     Type: AWS::Serverless::Function
+    DependsOn: EmailTopic
     Properties:
       CodeUri: src/data/
       Handler: cases.handler
@@ -68,7 +70,7 @@ Resources:
         - S3FullAccessPolicy:
             BucketName: !Ref S3Bucket
         - SNSPublishMessagePolicy:
-            TopicName: !Ref EmailTopic
+            TopicName: !GetAtt EmailTopic.TopicName
       Events:
         CaseEvent:
           Type: Schedule
@@ -77,6 +79,7 @@ Resources:
 
   VaccineDataFunction:
     Type: AWS::Serverless::Function
+    DependsOn: EmailTopic
     Properties:
       CodeUri: src/data/
       Handler: vaccines.handler
@@ -87,7 +90,7 @@ Resources:
         - S3FullAccessPolicy:
             BucketName: !Ref S3Bucket
         - SNSPublishMessagePolicy:
-            TopicName: !Ref EmailTopic
+            TopicName: !GetAtt EmailTopic.TopicName
       Events:
         VacEvent:
           Type: Schedule
@@ -96,6 +99,7 @@ Resources:
 
   DailyDataCheckFunction:
     Type: AWS::Serverless::Function
+    DependsOn: EmailTopic
     Properties:
       CodeUri: src/data/
       Handler: check.handler
@@ -103,7 +107,7 @@ Resources:
       Timeout: 60
       Policies:
         - SNSPublishMessagePolicy:
-            TopicName: !Ref EmailTopic
+            TopicName: !GetAtt EmailTopic.TopicName
       Events:
         DataCheckEvent:
           Type: Schedule
@@ -112,6 +116,7 @@ Resources:
 
   HealthCheckFunction:
     Type: AWS::Serverless::Function
+    DependsOn: EmailTopic
     Properties:
       CodeUri: src/api/
       Handler: health_check.handler
@@ -119,7 +124,7 @@ Resources:
       Timeout: 60
       Policies:
         - SNSPublishMessagePolicy:
-            TopicName: !Ref EmailTopic
+            TopicName: !GetAtt EmailTopic.TopicName
       Events:
         HealthEvent:
           Type: Schedule

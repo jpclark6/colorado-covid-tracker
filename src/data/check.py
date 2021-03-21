@@ -35,9 +35,7 @@ def handler(event=None, context=None):
     tables = []
     if latest_day_cases[0].day != today.day - 1:  # sub 1 for UTC
         tables.append("Cases")
-    if not latest_day_cases[
-        2
-    ]:  # check if web scraping for currently hospitalized worked
+    if not latest_day_cases[2]:  # check if web scraping for currently hospitalized worked
         tables.append("Currently Hospitalized")
     if latest_day_vaccines[0].day != today.day - 1:  # sub 1 for UTC
         tables.append("Vaccines")
