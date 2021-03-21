@@ -44,7 +44,7 @@ def handler(event=None, context=None):
     if tables:
         message += ", ".join(tables)
         message += "\nGood luck!"
-        topic = "ColoradoCovidData Missing Data"
+        subject = "ColoradoCovidData Missing Data"
         sns_client.publish(
             TopicArn=EMAIL_TOPIC,
             Message=message,

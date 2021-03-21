@@ -73,7 +73,7 @@ Resources:
         CaseEvent:
           Type: Schedule
           Properties:
-            Schedule: cron(*/10 0,1,2,3,23 * * ? *) # Every 10 min from 4PM to 9PM
+            Schedule: cron(*/10 0,1,2,22,23 * * ? *) # Every 10 min from 4PM to 9PM
 
   VaccineDataFunction:
     Type: AWS::Serverless::Function
@@ -92,7 +92,7 @@ Resources:
         VacEvent:
           Type: Schedule
           Properties:
-            Schedule: cron(*/10 0,1,2,3,23 * * ? *) # Every 10 min from 4PM to 9PM
+            Schedule: cron(*/10 0,1,2,22,23 * * ? *) # Every 10 min from 4PM to 9PM
 
   DailyDataCheckFunction:
     Type: AWS::Serverless::Function
@@ -108,7 +108,7 @@ Resources:
         DataCheckEvent:
           Type: Schedule
           Properties:
-            Schedule: cron(0 4 * * ? *) # daily at 9PM MST
+            Schedule: cron(0 3 * * ? *) # daily at 9PM MST
 
   HealthCheckFunction:
     Type: AWS::Serverless::Function
