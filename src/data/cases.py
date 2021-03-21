@@ -286,18 +286,3 @@ def save_currently_hospitalized(value):
     cur.execute(sql, (value, last_day))
     conn.commit()
     conn.close()
-
-    # https://covid19.colorado.gov/data
-    # <table border="2" cellpadding="2" cellspacing="1" style="width: 100%;"><thead></thead><tbody><tr><td style="width: 944px;">Percent of facilities updating (within 24 hours)</td>
-    #     <td style="width: 240px;">90%</td>
-    # </tr><tr><td style="width: 944px;">Number of patients currently hospitalized for confirmed COVID-19
-    #
-    # </td>
-    #     <td style="width: 240px;">
-    # 299</td>
-    # </tr><tr><td style="width: 944px;">
-    #
-    # Patients currently hospitalized as COVID-19 persons under investigation</td>
-    #     <td style="width: 240px;">54</td>
-    # </tr><tr><td style="width: 944px;">Number of patients discharged/transferred within past the 24 hours</td>
-    #     <td style="width: 240px;">39</td>
