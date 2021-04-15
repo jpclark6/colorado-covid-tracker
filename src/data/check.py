@@ -29,13 +29,15 @@ def handler(event=None, context=None):
     """
     latest_day_cases = fetch_latest_day_data("cases")
     latest_day_vaccines = fetch_latest_day_data("vaccines")
-    today = datetime.utcnow() - timedelta(days=1) # sub 1 for UTC
+    today = datetime.utcnow() - timedelta(days=1)  # sub 1 for UTC
 
     message = "Could not find current data for the following table(s): "
     tables = []
-    if latest_day_cases[0].day != today.day:  
+    if latest_day_cases[0].day != today.day:
         tables.append(f"Cases - actual {latest_day_cases[0]} - utcnow {today}")
-    if not latest_day_cases[2]:  # check if web scraping for currently hospitalized worked
+    if not latest_day_cases[
+        2
+    ]:  # check if web scraping for currently hospitalized worked
         tables.append("Currently Hospitalized")
     if latest_day_vaccines[0].day != today.day:
         tables.append(f"Vaccines - actual {latest_day_vaccines[0]} - utcnow {today}")

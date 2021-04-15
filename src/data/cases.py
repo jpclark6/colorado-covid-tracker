@@ -274,7 +274,9 @@ def update_currently_hospitalized():
     try:
         logger.info("Checking for currently hospitalized data")
         if datetime.utcnow().hour not in [0, 1, 2, 3, 22, 23]:
-            logger.info("Current time is invalid for requesting currently hospitalized data")
+            logger.info(
+                "Current time is invalid for requesting currently hospitalized data"
+            )
             return
         value = get_currently_hospitalized()
         save_currently_hospitalized(value)

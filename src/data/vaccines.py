@@ -187,7 +187,7 @@ def format_day(date):
 
 
 def new_day_formatted():
-    new_day = fetch_latest_day_data()["reporting_date"]# + timedelta(days=1)
+    new_day = fetch_latest_day_data()["reporting_date"]  # + timedelta(days=1)
     return format_day(new_day)
 
 
