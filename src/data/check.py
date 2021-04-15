@@ -3,7 +3,7 @@ Checks data once per day on a cron job to make sure data is
 in the database. Check late in the evening MST
 """
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 
 import boto3
@@ -29,16 +29,16 @@ def handler(event=None, context=None):
     """
     latest_day_cases = fetch_latest_day_data("cases")
     latest_day_vaccines = fetch_latest_day_data("vaccines")
-    today = datetime.utcnow()
+    today = datetime.utcnow() - timedelta(days=1) # sub 1 for UTC
 
     message = "Could not find current data for the following table(s): "
     tables = []
-    if latest_day_cases[0].day != today.day - 1:  # sub 1 for UTC
-        tables.append("Cases")
+    if latest_day_cases[0].day != today.day:  
+        tables.append(f"Cases - actual {latest_day_cases[0]} - utcnow {today}")
     if not latest_day_cases[2]:  # check if web scraping for currently hospitalized worked
         tables.append("Currently Hospitalized")
-    if latest_day_vaccines[0].day != today.day - 1:  # sub 1 for UTC
-        tables.append("Vaccines")
+    if latest_day_vaccines[0].day != today.day:
+        tables.append(f"Vaccines - actual {latest_day_vaccines[0]} - utcnow {today}")
     if tables:
         message += ", ".join(tables)
         message += "\nGood luck!"

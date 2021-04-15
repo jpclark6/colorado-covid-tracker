@@ -87,7 +87,7 @@ Resources:
       Handler: vaccines.handler
       Runtime: python3.8
       Timeout: 60
-      MemorySize: 350
+      MemorySize: 512
       Policies:
         - S3FullAccessPolicy:
             BucketName: !Ref S3Bucket

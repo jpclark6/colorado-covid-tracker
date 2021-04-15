@@ -50,6 +50,16 @@ components:
               items:
                 type: object
                 properties:
+                  daily_jandj:
+                    type: integer
+                  daily_moderna:
+                    type: integer
+                  daily_pfizer:
+                    type: integer
+                  distributed_increase:
+                    type: integer
+                  fully_immunized_increase:
+                    type: integer
                   daily_qty:
                     type: integer
                   one_dose_increase:
@@ -57,8 +67,6 @@ components:
                   reporting_date:
                     type: string
                     format: date
-                  two_doses_increase:
-                    type: integer
             daily_cases:
               type: array
               items:
@@ -72,6 +80,8 @@ components:
                     type: integer
                   hospitalized_increase:
                     type: integer
+                  total_hospitalized:
+                    type: integer
                   positive:
                     type: integer
                   positive_increase:
@@ -79,6 +89,12 @@ components:
                   tested:
                     type: integer
                   reporting_date:
+                    type: string
+                    format: date
+                  created_at:
+                    type: string
+                    format: date
+                  updated_at:
                     type: string
                     format: date
                   tested_increase:
@@ -90,17 +106,41 @@ components:
                 properties:
                   daily_cumulative:
                     type: integer
+                  daily_jandj:
+                    type: integer
+                  daily_moderna:
+                    type: integer
+                  daily_pfizer:
+                    type: integer
                   daily_qty:
+                    type: integer
+                  distributed_increase:
+                    type: integer
+                  distrubuted_total:
+                    type: integer
+                  fully_immunized_increase:
+                    type: integer
+                  fully_immunized_total:
+                    type: integer
+                  jandj_total:
+                    type: integer
+                  moderna_total:
                     type: integer
                   one_dose_increase:
                     type: integer
                   one_dose_total:
                     type: integer
-                  two_doses_increase:
+                  pfizer_total:
                     type: integer
-                  two_doses_total:
+                  total_vaccine_providers:
                     type: integer
                   reporting_date:
+                    type: string
+                    format: date
+                  created_at:
+                    type: string
+                    format: date
+                  updated_at:
                     type: string
                     format: date
         last_updated:

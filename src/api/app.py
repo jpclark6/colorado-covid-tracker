@@ -77,13 +77,6 @@ def get_health():
     return jsonify({"status": "ok"})
 
 
-# used to check alarm status, eventually remove
-@app.route("/throwerror/")
-@cross_origin()
-def get_error():
-    raise Exception("Testing")
-
-
 def data_still_valid(date):
     """
     Checks if the last updated time is cached, and if it is

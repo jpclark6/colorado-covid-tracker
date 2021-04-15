@@ -19,7 +19,7 @@ DB_CREDENTIALS = os.getenv("DB_CREDENTIALS")
 if not DB_CREDENTIALS:
     logger.error({"error": "no DB credentials env var found"})
 API_URL = (
-    "https://opendata.arcgis.com/datasets/566216cf203e400f8cbf2e6b4354bc57_0.geojson"
+    "https://opendata.arcgis.com/datasets/80193066bcb84a39893fbed995fc8ed0_0.geojson"
 )
 # following two keys aren't required to function, but if not included then the function
 # won't invalidate the cache as soon as new data is available, but it still
@@ -34,6 +34,10 @@ sns_client = boto3.client("sns")
 
 def handler(event=None, context=None):
     try:
+        if already_saved_todays_data():
+            logger.info("Data already grabbed for the day")
+            return "Success"
+
         logger.info("Requesting raw data")
         raw_data = get_raw_case_data()
 
@@ -71,6 +75,22 @@ def handler(event=None, context=None):
         )
         logger.error(message)
         return "Failed"
+
+
+def already_saved_todays_data():
+    """Check if last successful data save was less than 12 hrs ago"""
+    conn = psycopg2.connect(DB_CREDENTIALS)
+    cur = conn.cursor()
+    time_to_check = twelve_hours_ago()
+    cur.execute(
+        "SELECT * FROM invokes WHERE function_name = %s and invoke_time > %s and new_data = %s",
+        ("cases", time_to_check, True),
+    )
+    data = cur.fetchone()
+    conn.close()
+    if data:
+        return True
+    return False
 
 
 def invalidate_cache():
@@ -208,6 +228,11 @@ def next_day():
     return format_day(new_day)
 
 
+def twelve_hours_ago():
+    time = datetime.utcnow() - timedelta(hours=12)
+    return time.strftime("%Y-%m-%d %H:%M:%S")
+
+
 def week_before():
     return datetime.utcnow() - timedelta(days=7, hours=7)
 
@@ -247,7 +272,9 @@ def update_currently_hospitalized():
     # to avoid accidental overwrite of good data during
     # debugging or off hours update
     try:
-        if datetime.utcnow().hour not in [0, 1, 2, 3, 23]:
+        logger.info("Checking for currently hospitalized data")
+        if datetime.utcnow().hour not in [0, 1, 2, 3, 22, 23]:
+            logger.info("Current time is invalid for requesting currently hospitalized data")
             return
         value = get_currently_hospitalized()
         save_currently_hospitalized(value)

@@ -108,8 +108,7 @@ The API uses a lambda function with API Gateway. Since the data is valid until n
 ## Roadmap
 
 1. Get rid of psycopg2 and just use SQLAlchemy due to the increasing complexity of the tables
-1. After new data comes out stop requesting data for the rest of the day
-1. Find cool new data to save
+1. Find cool new data to save/show
 
 ## License
 

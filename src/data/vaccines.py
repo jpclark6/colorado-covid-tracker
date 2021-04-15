@@ -19,7 +19,7 @@ DB_CREDENTIALS = os.getenv("DB_CREDENTIALS")
 if not DB_CREDENTIALS:
     logger.error({"error": "no DB credentials env var found"})
 API_URL = (
-    "https://opendata.arcgis.com/datasets/a681d9e9f61144b2977badb89149198c_0.geojson"
+    "https://opendata.arcgis.com/datasets/fa9730c29ee24c7b8b52361ae3e5ca53_0.geojson"
 )
 # following two keys aren't required to function, but if not included then the function
 # won't invalidate the cache as soon as new data is available, but it still
@@ -34,6 +34,10 @@ sns_client = boto3.client("sns")
 
 def handler(event=None, context=None):
     try:
+        if already_saved_todays_data():
+            logger.info("Data already grabbed for the day")
+            return "Success"
+
         logger.info("Requesting raw data")
         raw_data = get_raw_vaccine_data()
 
@@ -69,6 +73,22 @@ def handler(event=None, context=None):
         )
         logger.error(message)
         return "Failed"
+
+
+def already_saved_todays_data():
+    """Check if last successful data save was less than 12 hrs ago"""
+    conn = psycopg2.connect(DB_CREDENTIALS)
+    cur = conn.cursor()
+    time_to_check = twelve_hours_ago()
+    cur.execute(
+        "SELECT * FROM invokes WHERE function_name = %s and invoke_time > %s and new_data = %s",
+        ("vaccines", time_to_check, True),
+    )
+    data = cur.fetchone()
+    conn.close()
+    if data:
+        return True
+    return False
 
 
 def invalidate_cache():
@@ -167,7 +187,7 @@ def format_day(date):
 
 
 def new_day_formatted():
-    new_day = fetch_latest_day_data()["reporting_date"] + timedelta(days=1)
+    new_day = fetch_latest_day_data()["reporting_date"]# + timedelta(days=1)
     return format_day(new_day)
 
 
@@ -279,14 +299,18 @@ def standardize_metric_names(sorted_data):
             if "Weekly" in key:
                 continue
             try:
-                temp_day[replacements[key]] = val
+                temp_day[replacements[key]] = int(val)
             except KeyError:
                 logger.error(f"Found unknown key: {key}")
+            except TypeError as e:
+                logger.error(f"Found unknown type: {e} for key {key}")
+            except ValueError:
+                temp_day[replacements[key]] = val
         updated_data.append(temp_day)
 
     for day in updated_data:
         if day.get("daily_cumulative_2"):
-            day["daily_cumulative"] = day.get("daily_cumulative_2")
+            day["daily_cumulative"] = int(day.get("daily_cumulative_2"))
             del day["daily_cumulative_2"]
         if day.get("daily"):  # confusing metric that isn't what it says
             del day["daily"]
@@ -355,6 +379,11 @@ def reporting_date_to_formatted(date):
 def get_raw_vaccine_data():
     res = requests.get(API_URL)
     return res.json()
+
+
+def twelve_hours_ago():
+    time = datetime.utcnow() - timedelta(hours=12)
+    return time.strftime("%Y-%m-%d %H:%M:%S")
 
 
 def save_to_s3(json_data, s3_filename):
